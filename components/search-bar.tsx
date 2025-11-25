@@ -34,7 +34,7 @@ export function SearchBar({ onSearch, placeholder }: SearchBarProps) {
           placeholder={placeholder || t("search.placeholder")}
           value={query}
           onChange={(e) => handleSearch(e.target.value)}
-          className="pl-10 pr-10 h-12 text-base"
+          className="pl-10 pr-10 h-10 sm:h-12 text-base"
         />
         {query && (
           <Button

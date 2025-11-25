@@ -37,6 +37,10 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap"
           rel="stylesheet"
         />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap"
+          rel="stylesheet"
+        />
         <style>{`
 html {
   font-family: ${openSans.style.fontFamily};
@@ -47,7 +51,13 @@ html {
         `}</style>
       </head>
       <body className={`${workSans.variable} ${openSans.variable} antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange={false}>
+        <ThemeProvider
+          attribute="class"
+          forcedTheme="light"
+          enableSystem={false}
+          defaultTheme="light"
+          disableTransitionOnChange={false}
+        >
           <LanguageProvider>
             <SettingsProvider>
               {children}

@@ -11,9 +11,9 @@ export default async function HomePage() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <main className="container mx-auto px-4 py-6 max-w-4xl">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Al-Quran Digital</h1>
+      <main className="container mx-auto px-3 md:px-4 py-4 md:py-6 max-w-4xl">
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Al-Quran Digital</h1>
           <p className="text-muted-foreground">Bacaan yang khusyuk dan penuh makna</p>
         </div>
 

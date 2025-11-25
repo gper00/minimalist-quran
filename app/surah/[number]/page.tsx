@@ -1,9 +1,12 @@
 import { notFound } from "next/navigation"
+import Link from "next/link"
 import { getSurahDetail } from "@/lib/api"
 import { Header } from "@/components/header"
 import { SurahHeader } from "@/components/surah-header"
 import { VerseCard } from "@/components/verse-card"
 import { BackButton } from "@/components/back-button"
+import { Button } from "@/components/ui/button"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import type { SurahDetail } from "@/lib/types"
 
 interface SurahPageProps {
@@ -25,16 +28,19 @@ export default async function SurahPage({ params }: SurahPageProps) {
     notFound()
   }
 
+  const previousSurah = surahNumber > 1 ? surahNumber - 1 : null
+  const nextSurah = surahNumber < 114 ? surahNumber + 1 : null
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-white">
       <Header />
 
-      <main className="container mx-auto px-4 py-6 max-w-4xl">
+      <main className="container mx-auto px-2 md:px-4 py-3 md:py-6 max-w-4xl pb-20 md:pb-6">
         <BackButton />
 
         <SurahHeader surah={surahDetail} />
 
-        <div className="space-y-6">
+        <div className="space-y-3 md:space-y-6">
           {surahDetail.verses.map((verse) => (
             <VerseCard
               key={verse.number}
@@ -46,13 +52,36 @@ export default async function SurahPage({ params }: SurahPageProps) {
             />
           ))}
         </div>
+
+        <div className="mt-8 md:mt-12 flex items-center justify-between gap-4">
+          {previousSurah ? (
+            <Link href={`/surah/${previousSurah}`}>
+              <Button variant="outline" className="flex items-center gap-2 bg-transparent">
+                <ChevronLeft className="h-4 w-4" />
+                <span>Surah Sebelumnya</span>
+              </Button>
+            </Link>
+          ) : (
+            <div />
+          )}
+
+          {nextSurah ? (
+            <Link href={`/surah/${nextSurah}`}>
+              <Button variant="outline" className="flex items-center gap-2 bg-transparent">
+                <span>Surah Berikutnya</span>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          ) : (
+            <div />
+          )}
+        </div>
       </main>
     </div>
   )
 }
 
 export async function generateStaticParams() {
-  // Generate paths for all 114 surahs
   const paths = Array.from({ length: 114 }, (_, i) => ({
     number: (i + 1).toString(),
   }))

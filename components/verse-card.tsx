@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { BookOpen, Bookmark, BookmarkCheck, Heart, HeartHandshake } from "lucide-react"
+import { BookOpen, Bookmark, BookmarkCheck, Heart, HeartHandshake, ImageDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
@@ -10,6 +10,7 @@ import { saveLastRead, getLastRead, saveSavedVerse, isVerseSaved, removeSavedVer
 import { useSettings } from "@/hooks/use-settings"
 import { useLanguage } from "@/hooks/use-language"
 import { TafsirModal } from "./tafsir-modal"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 interface VerseCardProps {
   verse: Verse
@@ -35,7 +36,6 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
   })
 
   const handleLastReadBookmark = () => {
-    // Save this verse as last read
     saveLastRead({
       surahNumber,
       verseNumber: verse.number,
@@ -45,14 +45,12 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
 
     setIsLastRead(true)
 
-    // Show success toast
     toast({
       title: t("toast.bookmark_saved"),
       description: `${surahName} ${t("audio.verse").toLowerCase()} ${verse.number} ${t("toast.bookmark_description")}`,
       duration: 3000,
     })
 
-    // Auto-remove bookmark visual after 3 seconds
     setTimeout(() => {
       const currentLastRead = getLastRead()
       if (
@@ -60,7 +58,6 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
         currentLastRead.surahNumber === surahNumber &&
         currentLastRead.verseNumber === verse.number
       ) {
-        // Keep it bookmarked if it's still the current last read
         return
       }
       setIsLastRead(false)
@@ -72,7 +69,6 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
     const translation = language === "en" ? verse.translation_en : verse.translation_id
 
     if (isSaved) {
-      // Remove from saved verses
       removeSavedVerse(verseId)
       setIsSaved(false)
       toast({
@@ -81,7 +77,6 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
         duration: 3000,
       })
     } else {
-      // Add to saved verses
       const savedVerse: SavedVerse = {
         id: verseId,
         surahNumber,
@@ -112,10 +107,132 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
 
   const translation = language === "en" ? verse.translation_en : verse.translation_id
 
+  const exportVerseImage = async (ext: "png" | "jpg") => {
+    try {
+      await (document as any).fonts?.ready
+
+      const SIZE = 1080
+      const canvas = document.createElement("canvas")
+      canvas.width = SIZE
+      canvas.height = SIZE
+      const ctx = canvas.getContext("2d")
+      if (!ctx) return
+
+      // Minimal color palette
+      const bg = "#ffffff"
+      const accent = "#2563eb"
+      const textDark = "#1f2937"
+      const textLight = "#9ca3af"
+      const textLightFaded = "#d1d5db"
+
+      // Background
+      ctx.fillStyle = bg
+      ctx.fillRect(0, 0, SIZE, SIZE)
+
+      // Top accent bar
+      ctx.fillStyle = accent
+      ctx.fillRect(0, 0, SIZE, 8)
+
+      // Content area with padding
+      const pad = 48
+      const contentW = SIZE - pad * 2
+
+      // Arabic text (right-to-left, centered)
+      ctx.fillStyle = textDark
+      ctx.textAlign = "center"
+      ctx.textBaseline = "middle"
+      ctx.direction = "rtl" as CanvasDirection
+
+      const arabicSize = 42
+      // Using Amiri font for better Arabic rendering without boxes
+      ctx.font = `700 ${arabicSize}px "Amiri", "Scheherazade New", "Noto Naskh Arabic", serif`
+
+      const arabicY = SIZE / 2 - 140
+      const arabicLines = verse.text.split(" ")
+      let arabicLine = ""
+      const arabicWrapped: string[] = []
+      for (const word of arabicLines) {
+        const test = arabicLine ? arabicLine + " " + word : word
+        const { width } = ctx.measureText(test)
+        if (width > contentW * 0.85 && arabicLine) {
+          arabicWrapped.push(arabicLine)
+          arabicLine = word
+        } else {
+          arabicLine = test
+        }
+      }
+      if (arabicLine) arabicWrapped.push(arabicLine)
+
+      let currentY = arabicY - (arabicWrapped.length - 1) * 28
+      for (const line of arabicWrapped) {
+        ctx.fillText(line, SIZE / 2, currentY)
+        currentY += 56
+      }
+
+      // Translation (left-to-right)
+      ctx.textAlign = "center"
+      ctx.direction = "ltr" as CanvasDirection
+      ctx.fillStyle = textLight
+      const translationSize = 16
+      ctx.font = `400 ${translationSize}px "Open Sans", system-ui`
+
+      const transLines = translation.split(" ")
+      let transLine = ""
+      const transWrapped: string[] = []
+      for (const word of transLines) {
+        const test = transLine ? transLine + " " + word : word
+        const { width } = ctx.measureText(test)
+        if (width > contentW * 0.9 && transLine) {
+          transWrapped.push(transLine)
+          transLine = word
+        } else {
+          transLine = test
+        }
+      }
+      if (transLine) transWrapped.push(transLine)
+
+      let transY = SIZE / 2 + 80
+      for (const line of transWrapped) {
+        ctx.fillText(line, SIZE / 2, transY)
+        transY += 26
+      }
+
+      // Surah and verse information
+      ctx.fillStyle = textLightFaded
+      ctx.font = "400 14px Open Sans, system-ui"
+      const infoLabel =
+        language === "id"
+          ? `${t("verse.surah_label")} ${surahName} • ${t("verse.verse_label")} ${verse.number}`
+          : `${t("verse.surah_label")} ${surahName} • ${t("verse.verse_label")} ${verse.number}`
+      ctx.fillText(infoLabel, SIZE / 2, SIZE / 2 + 140)
+
+      // URL and transparency
+      const url = "https://mysimplequran.vercel.app/"
+      ctx.fillStyle = "rgba(156, 163, 175, 0.6)"
+      ctx.font = "400 12px Open Sans, system-ui"
+      ctx.fillText(url, SIZE / 2, SIZE - pad + 16)
+
+      const mime = ext === "png" ? "image/png" : "image/jpeg"
+      const quality = ext === "jpg" ? 0.92 : undefined
+      const dataUrl = canvas.toDataURL(mime, quality as any)
+      const link = document.createElement("a")
+      link.href = dataUrl
+      link.download = `${surahName.replace(/\s+/g, "-").toLowerCase()}-${verse.number}-1x1.${ext}`
+      link.click()
+    } catch (e) {
+      console.error("[v0] exportVerseImage error", e)
+      toast({
+        title: t("toast.error") || "Error",
+        description: t("toast.try_again") || "Please try again",
+        duration: 3000,
+      })
+    }
+  }
+
   return (
     <>
       <Card id={`verse-${verse.number}`} className="scroll-mt-20">
-        <CardContent className="p-6">
+        <CardContent className="p-4 sm:p-6">
           <div className="flex items-start justify-between mb-4">
             <div className="verse-number">{verse.number}</div>
             <div className="flex items-center space-x-2">
@@ -130,7 +247,17 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
                   <BookOpen className="w-4 h-4" />
                 </Button>
               )}
-
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8" title={t("verse.export") || "Export"}>
+                    <ImageDown className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-32">
+                  <DropdownMenuItem onClick={() => exportVerseImage("png")}>PNG (1:1)</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => exportVerseImage("jpg")}>JPG (1:1)</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Button
                 variant="ghost"
                 size="icon"
@@ -140,12 +267,11 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
               >
                 {isSaved ? <HeartHandshake className="w-4 h-4" /> : <Heart className="w-4 h-4" />}
               </Button>
-
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={handleLastReadBookmark}
-                className={`h-8 w-8 ${isLastRead ? "text-primary" : ""}`}
+                className={`h-8 w-8 ${isLastRead ? "text-blue-600" : ""}`}
                 title={t("verse.bookmark")}
               >
                 {isLastRead ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
@@ -154,10 +280,9 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
           </div>
 
           <div className="space-y-4">
-            {/* Arabic Text with dynamic font size */}
             <div className="text-right">
               <p
-                className="font-arabic leading-loose text-foreground"
+                className="font-arabic leading-loose text-gray-900"
                 style={{
                   fontSize: `${settings.arabicFontSize}px`,
                   lineHeight: 1.8,
@@ -167,10 +292,9 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
               </p>
             </div>
 
-            {/* Translation with dynamic font size and language support */}
             <div className="text-left">
               <p
-                className="leading-relaxed text-muted-foreground"
+                className="leading-relaxed text-gray-600"
                 style={{
                   fontSize: `${settings.translationFontSize}px`,
                   lineHeight: 1.6,

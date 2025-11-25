@@ -17,7 +17,7 @@ interface SettingsContextType {
 const defaultSettings: Settings = {
   arabicFontSize: 24, // Default 1.5rem = 24px
   translationFontSize: 16, // Default 1rem = 16px
-  theme: "system",
+  theme: "light", // set default to light to match single-theme requirement
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined)

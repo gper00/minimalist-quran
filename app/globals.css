@@ -124,20 +124,22 @@
   }
 
   .font-arabic {
-    font-family: "Amiri", "Noto Naskh Arabic", serif;
+    font-family: "Scheherazade New", "Noto Naskh Arabic", "Amiri", serif;
     font-weight: 400;
-    line-height: 1.8;
+    line-height: 1.9;
     text-align: right;
     direction: rtl;
+    letter-spacing: 0; /* ensure natural Arabic spacing */
   }
 
   .arabic-text {
-    font-family: "Amiri", "Noto Naskh Arabic", serif;
+    font-family: "Scheherazade New", "Noto Naskh Arabic", "Amiri", serif;
     font-size: 1.5rem;
-    font-weight: 500;
+    font-weight: 600;
     line-height: 2;
     text-align: right;
     direction: rtl;
+    letter-spacing: 0;
   }
 
   .verse-number {

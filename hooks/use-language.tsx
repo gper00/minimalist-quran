@@ -24,6 +24,10 @@ const translations = {
     "home.makkiyah": "Makkiyah",
     "home.madaniyah": "Madaniyah",
     "home.surah_list": "Daftar Surah",
+    "home.title": "Beranda",
+    "menu.saved": "Tersimpan",
+    "menu.settings": "Pengaturan",
+    "menu.language": "Bahasa",
 
     // Surah Detail
     "surah.verses": "ayat",
@@ -38,6 +42,9 @@ const translations = {
     "verse.bookmark": "Tandai sebagai terakhir dibaca",
     "verse.save": "Simpan ayat",
     "verse.unsave": "Hapus dari simpanan",
+    "verse.export": "Ekspor Gambar",
+    "verse.surah_label": "Surah",
+    "verse.verse_label": "Ayat",
 
     // Settings
     "settings.title": "Pengaturan",
@@ -99,6 +106,10 @@ const translations = {
     "home.makkiyah": "Meccan",
     "home.madaniyah": "Medinan",
     "home.surah_list": "Surah List",
+    "home.title": "Home",
+    "menu.saved": "Saved",
+    "menu.settings": "Settings",
+    "menu.language": "Language",
 
     // Surah Detail
     "surah.verses": "verses",
@@ -113,6 +124,9 @@ const translations = {
     "verse.bookmark": "Mark as last read",
     "verse.save": "Save verse",
     "verse.unsave": "Remove from saved",
+    "verse.export": "Export Image",
+    "verse.surah_label": "Surah",
+    "verse.verse_label": "Verse",
 
     // Settings
     "settings.title": "Settings",

@@ -66,11 +66,8 @@ export function SurahList({ surahs }: SurahListProps) {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Search Bar */}
-      <div className="sticky top-20 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-4 -mx-4 px-4">
-        <SearchBar onSearch={handleSearch} />
-      </div>
+    <div className="space-y-4">
+      <SearchBar onSearch={handleSearch} />
 
       {/* Results Header */}
       <div className="flex items-center justify-between">
