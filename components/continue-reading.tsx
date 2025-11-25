@@ -44,14 +44,16 @@ export function ContinueReading() {
   return (
     <Card className="mb-8 border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent shadow-sm hover:shadow-md transition-all duration-300">
       <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex items-start md:items-center space-x-4 flex-1 min-w-0">
+            <div className="w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0">
               <BookOpen className="w-6 h-6" />
             </div>
-            <div className="space-y-1">
-              <h3 className="font-semibold text-foreground text-lg">{t("home.continue_reading")}</h3>
-              <p className="text-foreground/80 font-medium">
+            <div className="space-y-1 min-w-0 flex-1">
+              <h3 className="font-semibold text-foreground text-base md:text-lg truncate">
+                {t("home.continue_reading")}
+              </h3>
+              <p className="text-foreground/80 font-medium text-sm truncate">
                 {lastRead.surahName} - {t("audio.verse")} {lastRead.verseNumber}
               </p>
               <div className="flex items-center space-x-1 text-xs text-muted-foreground">
@@ -60,8 +62,8 @@ export function ContinueReading() {
               </div>
             </div>
           </div>
-          <div className="flex items-center space-x-3">
-            <Button asChild size="default" className="shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center space-x-2 self-start md:self-center">
+            <Button asChild size="sm" className="text-xs md:text-sm">
               <Link href={`/surah/${lastRead.surahNumber}#verse-${lastRead.verseNumber}`}>
                 {t("home.continue_reading")}
               </Link>
@@ -70,7 +72,7 @@ export function ContinueReading() {
               variant="ghost"
               size="icon"
               onClick={handleClearBookmark}
-              className="h-9 w-9 text-muted-foreground hover:text-foreground hover:bg-background/50 rounded-lg"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-background/50 rounded-lg"
               title="Hapus penanda"
             >
               <X className="w-4 h-4" />

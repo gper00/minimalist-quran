@@ -35,8 +35,7 @@ export function SurahHeader({ surah }: SurahHeaderProps) {
             {surah.verses?.length || 0} {t("home.verses")} • {surah.type}
           </p>
 
-          {/* Bismillah for all surahs except At-Taubah (9) */}
-          {surah.number_of_surah !== 9 && (
+          {surah.number_of_surah === 1 && (
             <div className="mb-6 p-4 bg-muted/30 rounded-lg border border-border/50">
               <p className="font-arabic text-2xl text-center text-foreground mb-3">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</p>
               <p className="text-sm text-muted-foreground text-center">{getBismillahTranslation()}</p>

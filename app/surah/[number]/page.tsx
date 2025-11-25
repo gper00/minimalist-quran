@@ -3,6 +3,7 @@ import Link from "next/link"
 import { getSurahDetail } from "@/lib/api"
 import { Header } from "@/components/header"
 import { SurahHeader } from "@/components/surah-header"
+import { BismillahIntro } from "@/components/bismillah-intro"
 import { VerseCard } from "@/components/verse-card"
 import { BackButton } from "@/components/back-button"
 import { Button } from "@/components/ui/button"
@@ -40,6 +41,10 @@ export default async function SurahPage({ params }: SurahPageProps) {
 
         <SurahHeader surah={surahDetail} />
 
+        {surahNumber !== 1 && surahNumber !== 9 && (
+          <BismillahIntro surahNumber={surahNumber} surahName={surahDetail.name} />
+        )}
+
         <div className="space-y-3 md:space-y-6">
           {surahDetail.verses.map((verse) => (
             <VerseCard
@@ -47,7 +52,6 @@ export default async function SurahPage({ params }: SurahPageProps) {
               verse={verse}
               surahNumber={surahNumber}
               surahName={surahDetail.name}
-              recitations={surahDetail.recitations}
               tafsir={surahDetail.tafsir?.id?.kemenag?.text?.[verse.number.toString()]}
             />
           ))}

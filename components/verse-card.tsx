@@ -107,6 +107,15 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
 
   const translation = language === "en" ? verse.translation_en : verse.translation_id
 
+  const getVerseText = () => {
+    if (verse.number === 1 && surahNumber !== 1 && surahNumber !== 9) {
+      // Remove Bismillah prefix from first verse text (it's shown in BismillahIntro)
+      const bismillahPattern = /^بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\s*/
+      return verse.text.replace(bismillahPattern, "").trim()
+    }
+    return verse.text
+  }
+
   const exportVerseImage = async (ext: "png" | "jpg") => {
     try {
       await (document as any).fonts?.ready
@@ -144,11 +153,10 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
       ctx.direction = "rtl" as CanvasDirection
 
       const arabicSize = 42
-      // Using Amiri font for better Arabic rendering without boxes
       ctx.font = `700 ${arabicSize}px "Amiri", "Scheherazade New", "Noto Naskh Arabic", serif`
 
       const arabicY = SIZE / 2 - 140
-      const arabicLines = verse.text.split(" ")
+      const arabicLines = getVerseText().split(" ")
       let arabicLine = ""
       const arabicWrapped: string[] = []
       for (const word of arabicLines) {
@@ -163,10 +171,11 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
       }
       if (arabicLine) arabicWrapped.push(arabicLine)
 
-      let currentY = arabicY - (arabicWrapped.length - 1) * 28
+      const lineHeightArabic = arabicWrapped.length > 3 ? 48 : 56
+      let currentY = arabicY - (arabicWrapped.length - 1) * (lineHeightArabic / 2)
       for (const line of arabicWrapped) {
         ctx.fillText(line, SIZE / 2, currentY)
-        currentY += 56
+        currentY += lineHeightArabic
       }
 
       // Translation (left-to-right)
@@ -191,10 +200,11 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
       }
       if (transLine) transWrapped.push(transLine)
 
-      let transY = SIZE / 2 + 80
+      let transY = currentY + 32
+      const lineHeightTranslation = 24
       for (const line of transWrapped) {
         ctx.fillText(line, SIZE / 2, transY)
-        transY += 26
+        transY += lineHeightTranslation
       }
 
       // Surah and verse information
@@ -204,7 +214,7 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
         language === "id"
           ? `${t("verse.surah_label")} ${surahName} • ${t("verse.verse_label")} ${verse.number}`
           : `${t("verse.surah_label")} ${surahName} • ${t("verse.verse_label")} ${verse.number}`
-      ctx.fillText(infoLabel, SIZE / 2, SIZE / 2 + 140)
+      ctx.fillText(infoLabel, SIZE / 2, transY + 24)
 
       // URL and transparency
       const url = "https://mysimplequran.vercel.app/"
@@ -288,7 +298,7 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
                   lineHeight: 1.8,
                 }}
               >
-                {verse.text}
+                {getVerseText()}
               </p>
             </div>
 
