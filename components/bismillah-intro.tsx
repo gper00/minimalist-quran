@@ -19,13 +19,13 @@ export function BismillahIntro({ surahNumber, surahName }: BismillahIntroProps) 
   }
 
   return (
-    <Card className="mb-6 border-primary/20 bg-muted/20">
-      <CardContent className="p-4">
-        <div className="text-center space-y-2">
-          <p className="font-arabic text-xl text-foreground">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</p>
-          <p className="text-sm text-muted-foreground">{getBismillahTranslation()}</p>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="py-20 mb-12 flex flex-col items-center justify-center space-y-6">
+      <p className="font-arabic text-4xl md:text-5xl text-foreground/80 tracking-widest leading-relaxed">
+        بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
+      </p>
+      <p className="text-sm md:text-base text-muted-foreground/60 font-medium max-w-lg text-center px-4 leading-relaxed tracking-wide">
+        {getBismillahTranslation()}
+      </p>
+    </div>
   )
 }

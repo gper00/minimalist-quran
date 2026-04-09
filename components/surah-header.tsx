@@ -26,23 +26,20 @@ export function SurahHeader({ surah }: SurahHeaderProps) {
   }
 
   return (
-    <Card className="mb-8 border-primary/20">
-      <CardContent className="p-6">
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-foreground mb-2">{surah.name}</h1>
-          <p className="text-lg text-muted-foreground mb-1">{getSurahName()}</p>
-          <p className="text-sm text-muted-foreground mb-4">
-            {surah.verses?.length || 0} {t("home.verses")} • {surah.type}
-          </p>
-
-          {surah.number_of_surah === 1 && (
-            <div className="mb-6 p-4 bg-muted/30 rounded-lg border border-border/50">
-              <p className="font-arabic text-2xl text-center text-foreground mb-3">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</p>
-              <p className="text-sm text-muted-foreground text-center">{getBismillahTranslation()}</p>
-            </div>
-          )}
+    <div className="text-center py-10 md:py-16 mb-8 border-b border-border/10">
+      <div className="space-y-4">
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
+          {surah.name}
+        </h1>
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-xl md:text-2xl text-muted-foreground font-medium">{getSurahName()}</p>
+          <div className="flex items-center gap-3 text-sm uppercase tracking-widest text-muted-foreground/60 font-semibold">
+            <span>{surah.verses?.length || 0} {t("home.verses")}</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-primary/30" />
+            <span>{surah.type}</span>
+          </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

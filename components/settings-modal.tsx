@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { RotateCcw, Palette, Type, Globe } from "lucide-react"
+import { useState, useEffect } from "react"
+import { RotateCcw, Palette, Type, Globe, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator"
 import { useSettings } from "@/hooks/use-settings"
 import { useLanguage } from "@/hooks/use-language"
+import { useTheme } from "next-themes"
 
 interface SettingsModalProps {
   isOpen: boolean
@@ -19,140 +20,170 @@ interface SettingsModalProps {
 export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const { settings, updateSettings, resetSettings } = useSettings()
   const { language, setLanguage, t } = useLanguage()
+  const { theme, setTheme } = useTheme()
   const [tempSettings, setTempSettings] = useState(settings)
+  const [tempTheme, setTempTheme] = useState<string>("light")
+
+  useEffect(() => {
+    if (isOpen) {
+      setTempSettings(settings)
+      setTempTheme(theme || "light")
+    }
+  }, [isOpen, settings, theme])
 
   const handleSave = () => {
     updateSettings(tempSettings)
+    setTheme(tempTheme)
     onClose()
+  }
+
+  const handleThemeChange = (newTheme: string) => {
+    setTempTheme(newTheme)
   }
 
   const handleReset = () => {
     resetSettings()
-    setTempSettings(settings)
+    setTempSettings({
+      arabicFontSize: 24,
+      translationFontSize: 16
+    })
+    setTempTheme("light")
   }
 
   const handleCancel = () => {
     setTempSettings(settings)
+    setTempTheme(theme || "light")
     onClose()
   }
 
+  const themes = [
+    { id: "light", name: "Light", color: "bg-white border-gray-200" },
+    { id: "sepia", name: "Sepia", color: "bg-[#f4ecd8] border-[#e2d6b5]" },
+    { id: "dark", name: "Dark", color: "bg-[#1a1a1a] border-gray-800" },
+  ]
+
   return (
     <Dialog open={isOpen} onOpenChange={handleCancel}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-        <DialogHeader className="space-y-3">
-          <DialogTitle className="flex items-center space-x-2 text-xl">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Palette className="w-4 h-4 text-primary" />
+      <DialogContent className="max-w-md w-[95vw] rounded-2xl p-0 overflow-hidden border-none bg-background">
+        <div className="p-6 space-y-8">
+          <DialogHeader className="space-y-1 text-left">
+            <DialogTitle className="text-2xl font-bold tracking-tight">
+              {t("settings.title")}
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground">
+              {t("settings.description")}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-8">
+            {/* Theme Selector - Visual Pill Style */}
+            <div className="space-y-4">
+              <Label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <Palette className="w-4 h-4" />
+                Tema Warna
+              </Label>
+              <div className="grid grid-cols-3 gap-3">
+                {themes.map((themeOption) => (
+                  <button
+                    key={themeOption.id}
+                    onClick={() => handleThemeChange(themeOption.id)}
+                    className={`
+                      relative flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-200
+                      ${tempTheme === themeOption.id 
+                        ? "border-primary bg-primary/5 ring-4 ring-primary/10" 
+                        : "border-transparent bg-muted/50 hover:bg-muted"}
+                    `}
+                  >
+                    <div className={`w-10 h-10 rounded-full border shadow-sm ${themeOption.color} flex items-center justify-center`}>
+                      {tempTheme === themeOption.id && <Check className={`w-5 h-5 ${themeOption.id === 'light' || themeOption.id === 'sepia' ? 'text-gray-800' : 'text-white'}`} />}
+                    </div>
+                    <span className="text-xs font-medium">{themeOption.name}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-            <span>{t("settings.title")}</span>
-          </DialogTitle>
-          <DialogDescription className="text-base">{t("settings.description")}</DialogDescription>
-        </DialogHeader>
 
-        <div className="space-y-6 py-4">
-          {/* Language Selection */}
-          <div className="space-y-3">
-            <div className="flex items-center space-x-2">
-              <Globe className="w-4 h-4 text-primary" />
-              <Label className="text-base font-medium">{t("settings.language")}</Label>
-            </div>
-            <Select value={language} onValueChange={setLanguage}>
-              <SelectTrigger className="h-10">
-                <SelectValue placeholder="Pilih bahasa" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="id">{t("settings.indonesian")}</SelectItem>
-                <SelectItem value="en">{t("settings.english")}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+            {/* Typography Settings */}
+            <div className="space-y-6">
+              <Label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <Type className="w-4 h-4" />
+                {t("settings.typography")}
+              </Label>
 
-          <Separator />
-
-          {/* Typography Settings */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <Type className="w-4 h-4 text-primary" />
-              <Label className="text-base font-medium">{t("settings.typography")}</Label>
-            </div>
-
-            {/* Arabic Font Size */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium text-muted-foreground">{t("settings.arabic_font_size")}</Label>
-              <div className="px-2">
+              {/* Arabic Font Size */}
+              <div className="space-y-4 px-1">
+                <div className="flex justify-between items-end">
+                  <Label className="text-sm font-medium">{t("settings.arabic_font_size")}</Label>
+                  <span className="text-xs font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-full">{tempSettings.arabicFontSize}px</span>
+                </div>
                 <Slider
                   min={18}
-                  max={36}
+                  max={42}
                   step={2}
                   value={[tempSettings.arabicFontSize]}
                   onValueChange={([value]) => setTempSettings({ ...tempSettings, arabicFontSize: value })}
-                  className="w-full"
+                  className="py-4"
                 />
-                <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                  <span>18px</span>
-                  <span className="font-medium">{tempSettings.arabicFontSize}px</span>
-                  <span>36px</span>
-                </div>
               </div>
-              {/* Preview */}
-              <div className="p-3 bg-muted/30 rounded-lg border border-border/50">
-                <p
-                  className="font-arabic text-right text-foreground"
-                  style={{ fontSize: `${tempSettings.arabicFontSize}px`, lineHeight: 1.8 }}
-                >
-                  بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
-                </p>
-              </div>
-            </div>
 
-            {/* Translation Font Size */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium text-muted-foreground">{t("settings.translation_font_size")}</Label>
-              <div className="px-2">
+              {/* Translation Font Size */}
+              <div className="space-y-4 px-1">
+                <div className="flex justify-between items-end">
+                  <Label className="text-sm font-medium">{t("settings.translation_font_size")}</Label>
+                  <span className="text-xs font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-full">{tempSettings.translationFontSize}px</span>
+                </div>
                 <Slider
                   min={12}
-                  max={20}
+                  max={24}
                   step={1}
                   value={[tempSettings.translationFontSize]}
                   onValueChange={([value]) => setTempSettings({ ...tempSettings, translationFontSize: value })}
-                  className="w-full"
+                  className="py-4"
                 />
-                <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                  <span>12px</span>
-                  <span className="font-medium">{tempSettings.translationFontSize}px</span>
-                  <span>20px</span>
-                </div>
               </div>
-              {/* Preview */}
-              <div className="p-3 bg-muted/30 rounded-lg border border-border/50">
-                <p
-                  className="text-muted-foreground"
-                  style={{ fontSize: `${tempSettings.translationFontSize}px`, lineHeight: 1.6 }}
-                >
-                  {language === "en"
-                    ? "In the name of Allah, the Entirely Merciful, the Especially Merciful."
-                    : "Dengan menyebut nama Allah Yang Maha Pemurah lagi Maha Penyayang."}
-                </p>
-              </div>
+            </div>
+
+            {/* Language Selection */}
+            <div className="space-y-4">
+              <Label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <Globe className="w-4 h-4" />
+                {t("settings.language")}
+              </Label>
+              <Select value={language} onValueChange={setLanguage}>
+                <SelectTrigger className="h-12 rounded-xl bg-muted/50 border-none px-4">
+                  <SelectValue placeholder="Pilih bahasa" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl border-none shadow-xl">
+                  <SelectItem value="id" className="rounded-lg">{t("settings.indonesian")}</SelectItem>
+                  <SelectItem value="en" className="rounded-lg">{t("settings.english")}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="flex justify-between pt-4 border-t border-border">
+        {/* Action Buttons */}
+        <div className="p-6 bg-muted/30 flex items-center gap-3 border-t border-border/50">
           <Button
-            variant="outline"
+            variant="ghost"
             onClick={handleReset}
-            className="flex items-center space-x-2 h-10 px-4 bg-transparent"
+            className="flex-none h-12 w-12 p-0 rounded-xl hover:bg-rose-50 hover:text-rose-600 transition-colors"
+            title={t("settings.reset")}
           >
-            <RotateCcw className="w-4 h-4" />
-            <span>{t("settings.reset")}</span>
+            <RotateCcw className="w-5 h-5" />
           </Button>
-          <div className="flex space-x-2">
-            <Button variant="outline" onClick={handleCancel} className="h-10 px-4 bg-transparent">
+          <div className="flex gap-2 flex-1">
+            <Button 
+              variant="ghost" 
+              onClick={handleCancel} 
+              className="flex-1 h-12 rounded-xl font-medium hover:bg-muted transition-colors"
+            >
               {t("settings.cancel")}
             </Button>
-            <Button onClick={handleSave} className="h-10 px-4">
+            <Button 
+              onClick={handleSave} 
+              className="flex-[1.5] h-12 rounded-xl font-bold shadow-lg shadow-primary/20 transition-transform active:scale-95"
+            >
               {t("settings.save")}
             </Button>
           </div>

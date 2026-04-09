@@ -108,12 +108,13 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
   const translation = language === "en" ? verse.translation_en : verse.translation_id
 
   const getVerseText = () => {
+    let text = verse.text
     if (verse.number === 1 && surahNumber !== 1 && surahNumber !== 9) {
-      // Remove Bismillah prefix from first verse text (it's shown in BismillahIntro)
-      const bismillahPattern = /^بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\s*/
-      return verse.text.replace(bismillahPattern, "").trim()
+      // Robust Bismillah removal using Regex to handle variations in spacing/harakat
+      const bismillahRegex = /^بِسْمِ\s+ٱللَّهِ\s+ٱلرَّحْمَٰنِ\s+ٱلرَّحِيمِ\s*/
+      text = text.replace(bismillahRegex, "").trim()
     }
-    return verse.text
+    return text
   }
 
   const exportVerseImage = async (ext: "png" | "jpg") => {
@@ -241,81 +242,91 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
 
   return (
     <>
-      <Card id={`verse-${verse.number}`} className="scroll-mt-20">
-        <CardContent className="p-4 sm:p-6">
-          <div className="flex items-start justify-between mb-4">
-            <div className="verse-number">{verse.number}</div>
-            <div className="flex items-center space-x-2">
+      <div id={`verse-${verse.number}`} className="verse-card scroll-mt-20">
+        <div className="flex flex-col gap-8">
+          {/* Header Verse: Number and Actions */}
+          <div className="flex items-center justify-between">
+            <div className="verse-number-wrapper">
+              <div className="verse-number text-primary/80">
+                {verse.number}
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-1 opacity-60 hover:opacity-100 transition-opacity">
               {tafsir && (
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={openTafsirModal}
-                  className="h-8 w-8"
+                  className="h-9 w-9 rounded-full"
                   title={t("verse.tafsir")}
                 >
-                  <BookOpen className="w-4 h-4" />
+                  <BookOpen className="w-4.5 h-4.5" />
                 </Button>
               )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" title={t("verse.export") || "Export"}>
-                    <ImageDown className="w-4 h-4" />
+                  <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full" title={t("verse.export") || "Export"}>
+                    <ImageDown className="w-4.5 h-4.5" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-32">
-                  <DropdownMenuItem onClick={() => exportVerseImage("png")}>PNG (1:1)</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => exportVerseImage("jpg")}>JPG (1:1)</DropdownMenuItem>
+                <DropdownMenuContent align="end" className="w-40">
+                  <DropdownMenuItem onClick={() => exportVerseImage("png")} className="cursor-pointer">
+                    PNG Image (1:1)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => exportVerseImage("jpg")} className="cursor-pointer">
+                    JPG Image (1:1)
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={handleSaveVerse}
-                className={`h-8 w-8 ${isSaved ? "text-red-500" : ""}`}
+                className={`h-9 w-9 rounded-full ${isSaved ? "text-rose-500 bg-rose-50/50" : ""}`}
                 title={isSaved ? t("verse.unsave") : t("verse.save")}
               >
-                {isSaved ? <HeartHandshake className="w-4 h-4" /> : <Heart className="w-4 h-4" />}
+                {isSaved ? <HeartHandshake className="w-4.5 h-4.5" /> : <Heart className="w-4.5 h-4.5" />}
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={handleLastReadBookmark}
-                className={`h-8 w-8 ${isLastRead ? "text-blue-600" : ""}`}
+                className={`h-9 w-9 rounded-full ${isLastRead ? "text-primary bg-primary/10" : ""}`}
                 title={t("verse.bookmark")}
               >
-                {isLastRead ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+                {isLastRead ? <BookmarkCheck className="w-4.5 h-4.5" /> : <Bookmark className="w-4.5 h-4.5" />}
               </Button>
             </div>
           </div>
 
-          <div className="space-y-4">
-            <div className="text-right">
-              <p
-                className="font-arabic leading-loose text-gray-900"
-                style={{
-                  fontSize: `${settings.arabicFontSize}px`,
-                  lineHeight: 1.8,
-                }}
-              >
-                {getVerseText()}
-              </p>
-            </div>
-
-            <div className="text-left">
-              <p
-                className="leading-relaxed text-gray-600"
-                style={{
-                  fontSize: `${settings.translationFontSize}px`,
-                  lineHeight: 1.6,
-                }}
-              >
-                {translation}
-              </p>
-            </div>
+          {/* Arabic Text */}
+          <div className="w-full">
+            <p
+              className="font-arabic text-foreground mb-6"
+              style={{
+                fontSize: `${settings.arabicFontSize}px`,
+                lineHeight: 2.2,
+              }}
+            >
+              {getVerseText()}
+            </p>
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Translation */}
+          <div className="w-full max-w-2xl">
+            <p
+              className="text-muted-foreground leading-relaxed font-medium"
+              style={{
+                fontSize: `${settings.translationFontSize}px`,
+              }}
+            >
+              <span className="text-primary/40 mr-2 font-bold">{verse.number}</span>
+              {translation}
+            </p>
+          </div>
+        </div>
+      </div>
 
       {tafsir && (
         <TafsirModal

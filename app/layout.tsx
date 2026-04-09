@@ -53,9 +53,9 @@ html {
       <body className={`${workSans.variable} ${openSans.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
-          forcedTheme="light"
-          enableSystem={false}
           defaultTheme="light"
+          enableSystem={true}
+          themes={["light", "dark", "sepia"]}
           disableTransitionOnChange={false}
         >
           <LanguageProvider>

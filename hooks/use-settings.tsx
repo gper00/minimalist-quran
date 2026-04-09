@@ -5,7 +5,6 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 interface Settings {
   arabicFontSize: number
   translationFontSize: number
-  theme: "light" | "dark" | "system"
 }
 
 interface SettingsContextType {
@@ -15,9 +14,8 @@ interface SettingsContextType {
 }
 
 const defaultSettings: Settings = {
-  arabicFontSize: 24, // Default 1.5rem = 24px
-  translationFontSize: 16, // Default 1rem = 16px
-  theme: "light", // set default to light to match single-theme requirement
+  arabicFontSize: 24,
+  translationFontSize: 16,
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined)
