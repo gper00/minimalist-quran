@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { SettingsProvider } from "@/hooks/use-settings"
 import { LanguageProvider } from "@/hooks/use-language"
 import { Toaster } from "@/components/ui/toaster"
+import { MobileBottomBar } from "@/components/mobile-bottom-bar"
 
 const workSans = Work_Sans({
   subsets: ["latin"],
@@ -61,6 +62,7 @@ html {
           <LanguageProvider>
             <SettingsProvider>
               {children}
+              <MobileBottomBar />
               <Toaster />
             </SettingsProvider>
           </LanguageProvider>

@@ -5,6 +5,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 interface Settings {
   arabicFontSize: number
   translationFontSize: number
+  showTranslation: boolean
 }
 
 interface SettingsContextType {
@@ -16,6 +17,7 @@ interface SettingsContextType {
 const defaultSettings: Settings = {
   arabicFontSize: 24,
   translationFontSize: 16,
+  showTranslation: true,
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined)

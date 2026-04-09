@@ -45,7 +45,8 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     resetSettings()
     setTempSettings({
       arabicFontSize: 24,
-      translationFontSize: 16
+      translationFontSize: 16,
+      showTranslation: true
     })
     setTempTheme("light")
   }
@@ -127,19 +128,38 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               </div>
 
               {/* Translation Font Size */}
-              <div className="space-y-4 px-1">
-                <div className="flex justify-between items-end">
-                  <Label className="text-sm font-medium">{t("settings.translation_font_size")}</Label>
-                  <span className="text-xs font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-full">{tempSettings.translationFontSize}px</span>
+              {tempSettings.showTranslation && (
+                <div className="space-y-4 px-1">
+                  <div className="flex justify-between items-end">
+                    <Label className="text-sm font-medium">{t("settings.translation_font_size")}</Label>
+                    <span className="text-xs font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-full">{tempSettings.translationFontSize}px</span>
+                  </div>
+                  <Slider
+                    min={12}
+                    max={24}
+                    step={1}
+                    value={[tempSettings.translationFontSize]}
+                    onValueChange={([value]) => setTempSettings({ ...tempSettings, translationFontSize: value })}
+                    className="py-4"
+                  />
                 </div>
-                <Slider
-                  min={12}
-                  max={24}
-                  step={1}
-                  value={[tempSettings.translationFontSize]}
-                  onValueChange={([value]) => setTempSettings({ ...tempSettings, translationFontSize: value })}
-                  className="py-4"
-                />
+              )}
+
+              {/* Show Translation Toggle */}
+              <div className="space-y-4 px-1">
+                <div className="flex justify-between items-center bg-muted/30 p-3 rounded-xl border border-border/50">
+                  <Label className="text-sm font-medium cursor-pointer" onClick={() => setTempSettings({ ...tempSettings, showTranslation: !tempSettings.showTranslation })}>
+                    Tampilkan Terjemahan
+                  </Label>
+                  <button 
+                    onClick={() => setTempSettings({ ...tempSettings, showTranslation: !tempSettings.showTranslation })}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${tempSettings.showTranslation ? 'bg-primary' : 'bg-muted-foreground/30'}`}
+                  >
+                    <span 
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${tempSettings.showTranslation ? 'translate-x-6' : 'translate-x-1'}`}
+                    />
+                  </button>
+                </div>
               </div>
             </div>
 

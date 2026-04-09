@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { BookOpen, Bookmark, BookmarkCheck, Heart, HeartHandshake, ImageDown } from "lucide-react"
+import { useState, useRef, useEffect } from "react"
+import { BookOpen, Bookmark, BookmarkCheck, Heart, HeartHandshake, ImageDown, PlayCircle, PauseCircle, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
@@ -26,6 +26,61 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
   const { settings } = useSettings()
   const { language, t } = useLanguage()
   const { toast } = useToast()
+
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current = null
+      }
+    }
+  }, [])
+
+  const toggleAudio = () => {
+    if (isPlaying) {
+      if (audioRef.current) audioRef.current.pause()
+      setIsPlaying(false)
+    } else {
+      if (!audioRef.current) {
+        setIsLoadingAudio(true)
+        const surahStr = String(surahNumber).padStart(3, '0')
+        const verseStr = String(verse.number).padStart(3, '0')
+        const audioUrl = `https://everyayah.com/data/Alafasy_128kbps/${surahStr}${verseStr}.mp3`
+        audioRef.current = new Audio(audioUrl)
+        
+        audioRef.current.onended = () => {
+          setIsPlaying(false)
+        }
+        audioRef.current.onerror = () => {
+          setIsPlaying(false)
+          setIsLoadingAudio(false)
+          toast({
+            title: "Error",
+            description: "Gagal memuat audio murottal.",
+            duration: 3000,
+          })
+        }
+        audioRef.current.oncanplay = () => {
+          setIsLoadingAudio(false)
+        }
+      }
+      
+      const playPromise = audioRef.current.play()
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          setIsPlaying(true)
+        }).catch(err => {
+          console.error("Audio playback error:", err)
+          setIsPlaying(false)
+          setIsLoadingAudio(false)
+        })
+      }
+    }
+  }
 
   useState(() => {
     const lastRead = getLastRead()
@@ -253,6 +308,21 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
             </div>
             
             <div className="flex items-center gap-1 opacity-60 hover:opacity-100 transition-opacity">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleAudio}
+                className={`h-9 w-9 rounded-full ${isPlaying || isLoadingAudio ? "text-primary bg-primary/10" : ""}`}
+                title={isPlaying ? "Hentikan Murottal" : "Putar Murottal"}
+              >
+                {isLoadingAudio ? (
+                  <Loader2 className="w-4.5 h-4.5 animate-spin" />
+                ) : isPlaying ? (
+                  <PauseCircle className="w-4.5 h-4.5" />
+                ) : (
+                  <PlayCircle className="w-4.5 h-4.5" />
+                )}
+              </Button>
               {tafsir && (
                 <Button
                   variant="ghost"
@@ -314,17 +384,19 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
           </div>
 
           {/* Translation */}
-          <div className="w-full max-w-2xl">
-            <p
-              className="text-muted-foreground leading-relaxed font-medium"
-              style={{
-                fontSize: `${settings.translationFontSize}px`,
-              }}
-            >
-              <span className="text-primary/40 mr-2 font-bold">{verse.number}</span>
-              {translation}
-            </p>
-          </div>
+          {settings.showTranslation && (
+            <div className="w-full max-w-2xl">
+              <p
+                className="text-muted-foreground leading-relaxed font-medium"
+                style={{
+                  fontSize: `${settings.translationFontSize}px`,
+                }}
+              >
+                <span className="text-primary/40 mr-2 font-bold">{verse.number}</span>
+                {translation}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 

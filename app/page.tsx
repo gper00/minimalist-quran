@@ -1,6 +1,7 @@
 import { getAllSurahs } from "@/lib/api"
 import { Header } from "@/components/header"
 import { SurahList } from "@/components/surah-list"
+import { ContinueReading } from "@/components/continue-reading"
 import type { Surah } from "@/lib/types"
 
 export default async function HomePage() {
@@ -23,6 +24,7 @@ export default async function HomePage() {
           </div>
         </section>
 
+        <ContinueReading />
         <SurahList surahs={surahs} />
       </main>
 

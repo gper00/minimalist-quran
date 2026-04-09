@@ -38,22 +38,22 @@ export default async function SurahPage({ params }: SurahPageProps) {
   const nextSurah = surahNumber < 114 ? surahNumber + 1 : null
 
   return (
-    <div className="h-screen bg-background transition-colors duration-300 overflow-hidden flex">
-      {/* Sidebar - Integrated from Top to Bottom */}
+    <div className="h-screen bg-background transition-colors duration-300 overflow-hidden flex flex-col md:flex-row">
+      {/* Sidebar - Integrated from Top to Bottom (Desktop) */}
       <aside className="hidden md:block w-72 lg:w-80 flex-shrink-0 border-r border-border/10 h-full">
         <SurahSidebar surahs={allSurahs} />
       </aside>
 
       <div className="flex-1 flex flex-col h-full overflow-hidden">
-        {/* Navbar - To the Right of Sidebar */}
-        <div className="flex-none border-b border-border/10">
+        {/* Navbar - Desktop Only */}
+        <div className="flex-none border-b border-border/10 hidden md:block">
           <Header centeredBrand />
         </div>
 
         {/* Main Content Area */}
         <main className="flex-1 h-full overflow-y-auto scroll-smooth custom-scrollbar">
-          <div className="px-6 md:px-12 py-10 pb-40 max-w-4xl mx-auto">
-            <div className="mb-12">
+          <div className="px-4 md:px-12 py-6 md:py-10 pb-40 max-w-4xl mx-auto">
+            <div className="mb-8 md:mb-12">
               <BackButton />
             </div>
 
@@ -113,7 +113,6 @@ export default async function SurahPage({ params }: SurahPageProps) {
           </main>
         </div>
       </div>
-    </div>
   )
 }
 
