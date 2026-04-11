@@ -1,29 +1,26 @@
+import fs from "fs/promises"
+import path from "path"
 import { cache } from "react"
 import type { Surah, SurahDetail } from "./types"
 
 export const getAllSurahs = cache(async (): Promise<Surah[]> => {
   try {
-    const response = await fetch("https://raw.githubusercontent.com/penggguna/QuranJSON/master/quran.json", {
-      next: { revalidate: 3600 * 24 } // Cache for 24 hours
-    })
-    if (!response.ok) throw new Error("Failed to fetch surahs")
-    return await response.json()
+    const filePath = path.join(process.cwd(), "data", "quran.json")
+    const fileData = await fs.readFile(filePath, "utf-8")
+    return JSON.parse(fileData)
   } catch (error) {
-    console.error("Error fetching surahs:", error)
+    console.error("Error loading surahs:", error)
     return []
   }
 })
 
 export const getSurahDetail = cache(async (surahNumber: number): Promise<SurahDetail | null> => {
   try {
-    const response = await fetch(
-      `https://raw.githubusercontent.com/penggguna/QuranJSON/master/surah/${surahNumber}.json`,
-      { next: { revalidate: 3600 * 24 } } // Cache for 24 hours
-    )
-    if (!response.ok) throw new Error(`Failed to fetch surah ${surahNumber}`)
-    return await response.json()
+    const filePath = path.join(process.cwd(), "data", "surah", `${surahNumber}.json`)
+    const fileData = await fs.readFile(filePath, "utf-8")
+    return JSON.parse(fileData)
   } catch (error) {
-    console.error(`Error fetching surah ${surahNumber}:`, error)
+    console.error(`Error loading surah ${surahNumber}:`, error)
     return null
   }
 })

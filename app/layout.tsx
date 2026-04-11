@@ -1,12 +1,14 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Work_Sans, Open_Sans } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { SettingsProvider } from "@/hooks/use-settings"
 import { LanguageProvider } from "@/hooks/use-language"
+import { AudioProvider } from "@/hooks/use-audio"
 import { Toaster } from "@/components/ui/toaster"
 import { MobileBottomBar } from "@/components/mobile-bottom-bar"
+import { GlobalAudioPlayer } from "@/components/global-audio-player"
 
 const workSans = Work_Sans({
   subsets: ["latin"],
@@ -20,10 +22,25 @@ const openSans = Open_Sans({
   variable: "--font-open-sans",
 })
 
+export const viewport: Viewport = {
+  themeColor: "#0f172a",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+}
+
 export const metadata: Metadata = {
   title: "Al-Quran Digital - Bacaan yang Khusyuk",
-  description: "Aplikasi Al-Quran digital minimalis untuk pengalaman membaca yang fokus dan khusyuk",
-  generator: "v0.app",
+  description: "Aplikasi Al-Quran digital minimalis untuk pengalaman membaca yang fokus dan khusyuk saat offline maupun online.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Al-Quran Digital",
+  },
+  formatDetection: {
+    telephone: false,
+  },
 }
 
 export default function RootLayout({
@@ -61,9 +78,12 @@ html {
         >
           <LanguageProvider>
             <SettingsProvider>
-              {children}
-              <MobileBottomBar />
-              <Toaster />
+              <AudioProvider>
+                {children}
+                <MobileBottomBar />
+                <GlobalAudioPlayer />
+                <Toaster />
+              </AudioProvider>
             </SettingsProvider>
           </LanguageProvider>
         </ThemeProvider>

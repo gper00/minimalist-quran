@@ -17,7 +17,7 @@ export function Header({ centeredBrand = false }: { centeredBrand?: boolean }) {
   return (
     <>
       <header
-        className={`hidden md:block z-50 w-full transition-transform duration-300 bg-background/80 backdrop-blur-md ${isVisible ? "translate-y-0" : "-translate-y-full"}`}
+        className={`z-50 w-full transition-transform duration-300 bg-background/80 backdrop-blur-md ${isVisible ? "translate-y-0" : "-translate-y-full"}`}
       >
         <div className="flex h-14 md:h-16 items-center justify-between px-6">
           {/* Logo Section */}

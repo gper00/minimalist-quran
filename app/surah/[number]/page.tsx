@@ -9,6 +9,7 @@ import { BackButton } from "@/components/back-button"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { SurahSidebar } from "@/components/surah-sidebar"
+import { MobileSurahDrawer } from "@/components/mobile-surah-drawer"
 import type { SurahDetail, Surah } from "@/lib/types"
 
 interface SurahPageProps {
@@ -45,19 +46,23 @@ export default async function SurahPage({ params }: SurahPageProps) {
       </aside>
 
       <div className="flex-1 flex flex-col h-full overflow-hidden">
-        {/* Navbar - Desktop Only */}
-        <div className="flex-none border-b border-border/10 hidden md:block">
+        {/* Navbar - Desktop & Mobile */}
+        <div className="flex-none border-b border-border/10 sticky top-0 z-40 bg-background/95 backdrop-blur-md">
           <Header centeredBrand />
         </div>
 
         {/* Main Content Area */}
         <main className="flex-1 h-full overflow-y-auto scroll-smooth custom-scrollbar">
-          <div className="px-4 md:px-12 py-6 md:py-10 pb-40 max-w-4xl mx-auto">
-            <div className="mb-8 md:mb-12">
-              <BackButton />
-            </div>
+          {/* Added pb-36 to guarantee clearance above the MobileBottomBar */}
+          <div className="px-4 md:px-12 py-6 md:py-10 pb-36 max-w-4xl mx-auto">
+              <div className="flex items-center justify-between mb-8 md:mb-12">
+                <BackButton />
+                <div className="md:hidden">
+                  <MobileSurahDrawer surahs={allSurahs} />
+                </div>
+              </div>
 
-            <SurahHeader surah={surahDetail} />
+              <SurahHeader surah={surahDetail} />
 
             {surahNumber !== 1 && surahNumber !== 9 && (
               <BismillahIntro surahNumber={surahNumber} surahName={surahDetail.name} />
@@ -71,6 +76,7 @@ export default async function SurahPage({ params }: SurahPageProps) {
                   surahNumber={surahNumber}
                   surahName={surahDetail.name}
                   tafsir={surahDetail.tafsir?.id?.kemenag?.text?.[verse.number.toString()]}
+                  totalVerses={surahDetail.number_of_ayah}
                 />
               ))}
             </div>

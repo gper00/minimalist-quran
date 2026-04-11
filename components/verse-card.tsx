@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState } from "react"
 import { BookOpen, Bookmark, BookmarkCheck, Heart, HeartHandshake, ImageDown, PlayCircle, PauseCircle, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -9,6 +9,7 @@ import type { Verse, SavedVerse } from "@/lib/types"
 import { saveLastRead, getLastRead, saveSavedVerse, isVerseSaved, removeSavedVerse } from "@/lib/storage"
 import { useSettings } from "@/hooks/use-settings"
 import { useLanguage } from "@/hooks/use-language"
+import { useAudio } from "@/hooks/use-audio"
 import { TafsirModal } from "./tafsir-modal"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
@@ -17,68 +18,39 @@ interface VerseCardProps {
   surahNumber: number
   surahName: string
   tafsir?: string
+  totalVerses?: number
 }
 
-export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardProps) {
+export function VerseCard({ verse, surahNumber, surahName, tafsir, totalVerses = 0 }: VerseCardProps) {
   const [showTafsirModal, setShowTafsirModal] = useState(false)
   const [isLastRead, setIsLastRead] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
+  
   const { settings } = useSettings()
   const { language, t } = useLanguage()
   const { toast } = useToast()
-
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [isLoadingAudio, setIsLoadingAudio] = useState(false)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
-
-  useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause()
-        audioRef.current = null
-      }
-    }
-  }, [])
+  
+  // Global Audio Context hooks
+  const { status, currentSurah, currentVerse, playVerse, pause, resume } = useAudio()
+  
+  const isThisVerseAudioActive = currentSurah === surahNumber && currentVerse === verse.number
+  const isPlaying = isThisVerseAudioActive && status === "playing"
+  const isLoadingAudio = isThisVerseAudioActive && status === "loading"
 
   const toggleAudio = () => {
-    if (isPlaying) {
-      if (audioRef.current) audioRef.current.pause()
-      setIsPlaying(false)
+    if (isThisVerseAudioActive) {
+      if (status === "playing") {
+        pause()
+      } else if (status === "paused") {
+        resume()
+      }
     } else {
-      if (!audioRef.current) {
-        setIsLoadingAudio(true)
-        const surahStr = String(surahNumber).padStart(3, '0')
-        const verseStr = String(verse.number).padStart(3, '0')
-        const audioUrl = `https://everyayah.com/data/Alafasy_128kbps/${surahStr}${verseStr}.mp3`
-        audioRef.current = new Audio(audioUrl)
-        
-        audioRef.current.onended = () => {
-          setIsPlaying(false)
-        }
-        audioRef.current.onerror = () => {
-          setIsPlaying(false)
-          setIsLoadingAudio(false)
-          toast({
-            title: "Error",
-            description: "Gagal memuat audio murottal.",
-            duration: 3000,
-          })
-        }
-        audioRef.current.oncanplay = () => {
-          setIsLoadingAudio(false)
-        }
-      }
-      
-      const playPromise = audioRef.current.play()
-      if (playPromise !== undefined) {
-        playPromise.then(() => {
-          setIsPlaying(true)
-        }).catch(err => {
-          console.error("Audio playback error:", err)
-          setIsPlaying(false)
-          setIsLoadingAudio(false)
-        })
-      }
+      playVerse({
+        surahNumber,
+        verseNumber: verse.number,
+        surahName,
+        totalVerses
+      })
     }
   }
 
@@ -183,42 +155,64 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
       const ctx = canvas.getContext("2d")
       if (!ctx) return
 
-      // Minimal color palette
-      const bg = "#ffffff"
-      const accent = "#2563eb"
-      const textDark = "#1f2937"
-      const textLight = "#9ca3af"
-      const textLightFaded = "#d1d5db"
+      // Premium Dark Theme Palette
+      const gradient = ctx.createRadialGradient(SIZE / 2, SIZE / 2, 100, SIZE / 2, SIZE / 2, SIZE)
+      gradient.addColorStop(0, "#1e293b") // slate-800
+      gradient.addColorStop(1, "#0f172a") // slate-900
 
       // Background
-      ctx.fillStyle = bg
+      ctx.fillStyle = gradient
       ctx.fillRect(0, 0, SIZE, SIZE)
 
-      // Top accent bar
-      ctx.fillStyle = accent
+      // Decorative Circles (Watermark Motif)
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.04)"
+      ctx.lineWidth = 1.5
+      for (let i = 0; i < 6; i++) {
+        ctx.beginPath()
+        ctx.arc(SIZE / 2, SIZE / 2, 280 + i * 70, 0, Math.PI * 2)
+        ctx.stroke()
+      }
+
+      // Elegant Gold Bars
+      const accentGrad = ctx.createLinearGradient(0, 0, SIZE, 0)
+      accentGrad.addColorStop(0, "#ca8a04") // yellow-600
+      accentGrad.addColorStop(0.5, "#fef08a") // yellow-200
+      accentGrad.addColorStop(1, "#ca8a04")
+
+      ctx.fillStyle = accentGrad
       ctx.fillRect(0, 0, SIZE, 8)
+      ctx.fillRect(0, SIZE - 8, SIZE, 8)
+
+      // Thin inner border
+      ctx.strokeStyle = "rgba(234, 179, 8, 0.2)"
+      ctx.lineWidth = 2
+      ctx.strokeRect(30, 38, SIZE - 60, SIZE - 76)
 
       // Content area with padding
-      const pad = 48
+      const pad = 64
       const contentW = SIZE - pad * 2
 
       // Arabic text (right-to-left, centered)
-      ctx.fillStyle = textDark
+      ctx.fillStyle = "#ffffff"
       ctx.textAlign = "center"
       ctx.textBaseline = "middle"
       ctx.direction = "rtl" as CanvasDirection
 
-      const arabicSize = 42
+      ctx.shadowColor = "rgba(0, 0, 0, 0.5)"
+      ctx.shadowBlur = 10
+      ctx.shadowOffsetY = 4
+
+      const arabicSize = 48
       ctx.font = `700 ${arabicSize}px "Amiri", "Scheherazade New", "Noto Naskh Arabic", serif`
 
-      const arabicY = SIZE / 2 - 140
+      const arabicY = SIZE / 2 - 130
       const arabicLines = getVerseText().split(" ")
       let arabicLine = ""
       const arabicWrapped: string[] = []
       for (const word of arabicLines) {
         const test = arabicLine ? arabicLine + " " + word : word
         const { width } = ctx.measureText(test)
-        if (width > contentW * 0.85 && arabicLine) {
+        if (width > contentW * 0.9 && arabicLine) {
           arabicWrapped.push(arabicLine)
           arabicLine = word
         } else {
@@ -227,19 +221,21 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
       }
       if (arabicLine) arabicWrapped.push(arabicLine)
 
-      const lineHeightArabic = arabicWrapped.length > 3 ? 48 : 56
-      let currentY = arabicY - (arabicWrapped.length - 1) * (lineHeightArabic / 2)
+      const lineHeightArabic = arabicWrapped.length > 3 ? 60 : 72
+      let currentY = arabicY - ((arabicWrapped.length - 1) * lineHeightArabic) / 2
       for (const line of arabicWrapped) {
         ctx.fillText(line, SIZE / 2, currentY)
         currentY += lineHeightArabic
       }
 
+      ctx.shadowColor = "transparent"
+
       // Translation (left-to-right)
       ctx.textAlign = "center"
       ctx.direction = "ltr" as CanvasDirection
-      ctx.fillStyle = textLight
-      const translationSize = 16
-      ctx.font = `400 ${translationSize}px "Open Sans", system-ui`
+      ctx.fillStyle = "rgba(255, 255, 255, 0.85)"
+      const translationSize = 17
+      ctx.font = `400 ${translationSize}px "Inter", system-ui, sans-serif`
 
       const transLines = translation.split(" ")
       let transLine = ""
@@ -247,7 +243,7 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
       for (const word of transLines) {
         const test = transLine ? transLine + " " + word : word
         const { width } = ctx.measureText(test)
-        if (width > contentW * 0.9 && transLine) {
+        if (width > contentW * 0.95 && transLine) {
           transWrapped.push(transLine)
           transLine = word
         } else {
@@ -256,27 +252,31 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
       }
       if (transLine) transWrapped.push(transLine)
 
-      let transY = currentY + 32
-      const lineHeightTranslation = 24
+      let transY = currentY + 40
+      const lineHeightTranslation = 28
       for (const line of transWrapped) {
         ctx.fillText(line, SIZE / 2, transY)
         transY += lineHeightTranslation
       }
 
       // Surah and verse information
-      ctx.fillStyle = textLightFaded
-      ctx.font = "400 14px Open Sans, system-ui"
+      ctx.fillStyle = "#eab308" // Gold color
+      ctx.font = "600 15px Inter, system-ui, sans-serif"
+      ;(ctx as any).letterSpacing = "2px"
+      
       const infoLabel =
         language === "id"
-          ? `${t("verse.surah_label")} ${surahName} • ${t("verse.verse_label")} ${verse.number}`
-          : `${t("verse.surah_label")} ${surahName} • ${t("verse.verse_label")} ${verse.number}`
-      ctx.fillText(infoLabel, SIZE / 2, transY + 24)
+          ? `${surahName.toUpperCase()} • AYAT ${verse.number}`
+          : `${surahName.toUpperCase()} • VERSE ${verse.number}`
+      
+      ctx.fillText(infoLabel, SIZE / 2, transY + 36)
+      ;(ctx as any).letterSpacing = "0px" // Reset
 
-      // URL and transparency
-      const url = "https://mysimplequran.vercel.app/"
-      ctx.fillStyle = "rgba(156, 163, 175, 0.6)"
-      ctx.font = "400 12px Open Sans, system-ui"
-      ctx.fillText(url, SIZE / 2, SIZE - pad + 16)
+      // App Watermark / URL
+      const url = "Al-Quran Digital · mysimplequran.vercel.app"
+      ctx.fillStyle = "rgba(255, 255, 255, 0.3)"
+      ctx.font = "500 13px Inter, system-ui, sans-serif"
+      ctx.fillText(url, SIZE / 2, SIZE - pad + 10)
 
       const mime = ext === "png" ? "image/png" : "image/jpeg"
       const quality = ext === "jpg" ? 0.92 : undefined
@@ -297,7 +297,7 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
 
   return (
     <>
-      <div id={`verse-${verse.number}`} className="verse-card scroll-mt-20">
+      <div id={`verse-${verse.number}`} className="verse-card scroll-mt-20 pb-12 border-b border-border/5 mb-4">
         <div className="flex flex-col gap-8">
           {/* Header Verse: Number and Actions */}
           <div className="flex items-center justify-between">
@@ -307,20 +307,20 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
               </div>
             </div>
             
-            <div className="flex items-center gap-1 opacity-60 hover:opacity-100 transition-opacity">
+            <div className="flex items-center gap-2 md:gap-3 opacity-60 hover:opacity-100 transition-opacity flex-wrap justify-end">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleAudio}
-                className={`h-9 w-9 rounded-full ${isPlaying || isLoadingAudio ? "text-primary bg-primary/10" : ""}`}
+                className={`h-10 w-10 md:h-11 md:w-11 rounded-full ${isPlaying || isLoadingAudio ? "text-primary bg-primary/10" : ""}`}
                 title={isPlaying ? "Hentikan Murottal" : "Putar Murottal"}
               >
                 {isLoadingAudio ? (
-                  <Loader2 className="w-4.5 h-4.5 animate-spin" />
+                  <Loader2 className="w-5 h-5 md:w-5 md:h-5 animate-spin" />
                 ) : isPlaying ? (
-                  <PauseCircle className="w-4.5 h-4.5" />
+                  <PauseCircle className="w-5 h-5 md:w-5 md:h-5" />
                 ) : (
-                  <PlayCircle className="w-4.5 h-4.5" />
+                  <PlayCircle className="w-5 h-5 md:w-5 md:h-5" />
                 )}
               </Button>
               {tafsir && (
@@ -328,16 +328,16 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
                   variant="ghost"
                   size="icon"
                   onClick={openTafsirModal}
-                  className="h-9 w-9 rounded-full"
+                  className="h-10 w-10 md:h-11 md:w-11 rounded-full"
                   title={t("verse.tafsir")}
                 >
-                  <BookOpen className="w-4.5 h-4.5" />
+                  <BookOpen className="w-5 h-5 md:w-5 md:h-5" />
                 </Button>
               )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full" title={t("verse.export") || "Export"}>
-                    <ImageDown className="w-4.5 h-4.5" />
+                  <Button variant="ghost" size="icon" className="h-10 w-10 md:h-11 md:w-11 rounded-full" title={t("verse.export") || "Export"}>
+                    <ImageDown className="w-5 h-5 md:w-5 md:h-5" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-40">
@@ -353,19 +353,19 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
                 variant="ghost"
                 size="icon"
                 onClick={handleSaveVerse}
-                className={`h-9 w-9 rounded-full ${isSaved ? "text-rose-500 bg-rose-50/50" : ""}`}
+                className={`h-10 w-10 md:h-11 md:w-11 rounded-full ${isSaved ? "text-rose-500 bg-rose-50/50" : ""}`}
                 title={isSaved ? t("verse.unsave") : t("verse.save")}
               >
-                {isSaved ? <HeartHandshake className="w-4.5 h-4.5" /> : <Heart className="w-4.5 h-4.5" />}
+                {isSaved ? <HeartHandshake className="w-5 h-5 md:w-5 md:h-5" /> : <Heart className="w-5 h-5 md:w-5 md:h-5" />}
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={handleLastReadBookmark}
-                className={`h-9 w-9 rounded-full ${isLastRead ? "text-primary bg-primary/10" : ""}`}
+                className={`h-10 w-10 md:h-11 md:w-11 rounded-full ${isLastRead ? "text-primary bg-primary/10" : ""}`}
                 title={t("verse.bookmark")}
               >
-                {isLastRead ? <BookmarkCheck className="w-4.5 h-4.5" /> : <Bookmark className="w-4.5 h-4.5" />}
+                {isLastRead ? <BookmarkCheck className="w-5 h-5 md:w-5 md:h-5" /> : <Bookmark className="w-5 h-5 md:w-5 md:h-5" />}
               </Button>
             </div>
           </div>
@@ -373,7 +373,8 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
           {/* Arabic Text */}
           <div className="w-full">
             <p
-              className="font-arabic text-foreground mb-6"
+              className="font-arabic text-foreground mb-6 text-right"
+              dir="rtl"
               style={{
                 fontSize: `${settings.arabicFontSize}px`,
                 lineHeight: 2.2,
@@ -387,12 +388,12 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir }: VerseCardPr
           {settings.showTranslation && (
             <div className="w-full max-w-2xl">
               <p
-                className="text-muted-foreground leading-relaxed font-medium"
+                className="text-muted-foreground leading-relaxed font-medium text-justify"
                 style={{
                   fontSize: `${settings.translationFontSize}px`,
                 }}
               >
-                <span className="text-primary/40 mr-2 font-bold">{verse.number}</span>
+                <span className="text-primary/60 mr-3 font-bold text-lg">{verse.number}</span>
                 {translation}
               </p>
             </div>

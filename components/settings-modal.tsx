@@ -65,16 +65,21 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleCancel}>
-      <DialogContent className="max-w-md w-[95vw] rounded-2xl p-0 overflow-hidden border-none bg-background">
-        <div className="p-6 space-y-8">
-          <DialogHeader className="space-y-1 text-left">
-            <DialogTitle className="text-2xl font-bold tracking-tight">
+      <DialogContent className="max-w-md w-[95vw] rounded-3xl p-0 overflow-hidden border border-border/40 bg-background/95 backdrop-blur-xl shadow-2xl">
+        {/* Sticky Header with Glassmorphism */}
+        <div className="sticky top-0 z-10 px-8 py-6 pb-4 bg-background/80 backdrop-blur-xl border-b border-border/30">
+          <DialogHeader className="space-y-1.5 text-left">
+            <DialogTitle className="text-2xl font-bold tracking-tight text-foreground">
               {t("settings.title")}
             </DialogTitle>
-            <DialogDescription className="text-muted-foreground">
+            <DialogDescription className="text-sm font-medium text-muted-foreground/80">
               {t("settings.description")}
             </DialogDescription>
           </DialogHeader>
+        </div>
+
+        {/* Scrollable Content Area */}
+        <div className="px-8 py-6 space-y-10 max-h-[60vh] overflow-y-auto overflow-x-hidden">
 
           <div className="space-y-8">
             {/* Theme Selector - Visual Pill Style */}
@@ -147,16 +152,16 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
               {/* Show Translation Toggle */}
               <div className="space-y-4 px-1">
-                <div className="flex justify-between items-center bg-muted/30 p-3 rounded-xl border border-border/50">
-                  <Label className="text-sm font-medium cursor-pointer" onClick={() => setTempSettings({ ...tempSettings, showTranslation: !tempSettings.showTranslation })}>
+                <div className="flex justify-between items-center bg-muted/40 p-4 rounded-2xl border border-border/30 hover:bg-muted/60 transition-colors">
+                  <Label className="text-sm font-semibold cursor-pointer" onClick={() => setTempSettings({ ...tempSettings, showTranslation: !tempSettings.showTranslation })}>
                     Tampilkan Terjemahan
                   </Label>
                   <button 
                     onClick={() => setTempSettings({ ...tempSettings, showTranslation: !tempSettings.showTranslation })}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${tempSettings.showTranslation ? 'bg-primary' : 'bg-muted-foreground/30'}`}
+                    className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${tempSettings.showTranslation ? 'bg-primary' : 'bg-muted-foreground/30'}`}
                   >
                     <span 
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${tempSettings.showTranslation ? 'translate-x-6' : 'translate-x-1'}`}
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform ${tempSettings.showTranslation ? 'translate-x-6' : 'translate-x-1'}`}
                     />
                   </button>
                 </div>
@@ -183,26 +188,26 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
         </div>
 
         {/* Action Buttons */}
-        <div className="p-6 bg-muted/30 flex items-center gap-3 border-t border-border/50">
+        <div className="p-6 px-8 bg-background/50 backdrop-blur-md flex items-center gap-4 border-t border-border/30">
           <Button
-            variant="ghost"
+            variant="outline"
             onClick={handleReset}
-            className="flex-none h-12 w-12 p-0 rounded-xl hover:bg-rose-50 hover:text-rose-600 transition-colors"
+            className="flex-none h-12 w-12 p-0 rounded-2xl hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all duration-300"
             title={t("settings.reset")}
           >
             <RotateCcw className="w-5 h-5" />
           </Button>
-          <div className="flex gap-2 flex-1">
+          <div className="flex gap-3 flex-1">
             <Button 
-              variant="ghost" 
+              variant="outline" 
               onClick={handleCancel} 
-              className="flex-1 h-12 rounded-xl font-medium hover:bg-muted transition-colors"
+              className="flex-1 h-12 rounded-2xl font-bold bg-transparent hover:bg-muted/50 transition-colors"
             >
               {t("settings.cancel")}
             </Button>
             <Button 
               onClick={handleSave} 
-              className="flex-[1.5] h-12 rounded-xl font-bold shadow-lg shadow-primary/20 transition-transform active:scale-95"
+              className="flex-[1.5] h-12 rounded-2xl font-bold shadow-xl shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.02] transition-all duration-300 active:scale-95"
             >
               {t("settings.save")}
             </Button>

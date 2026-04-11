@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Home, Heart, Settings, Languages, Menu } from "lucide-react"
+import { Home, Heart, Settings, Clock } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import { useLanguage } from "@/hooks/use-language"
 import { SavedVersesModal } from "@/components/saved-verses-modal"
@@ -21,9 +21,9 @@ export function MobileBottomBar() {
 
   const navItems = [
     { id: 'home', icon: Home, label: 'Home', onClick: () => router.push('/') },
+    { id: 'jadwal', icon: Clock, label: 'Jadwal', onClick: () => router.push('/jadwal') },
     { id: 'saved', icon: Heart, label: 'Saved', onClick: () => setShowSaved(true) },
     { id: 'settings', icon: Settings, label: 'Settings', onClick: () => setShowSettings(true) },
-    { id: 'lang', icon: Languages, label: language.toUpperCase(), onClick: toggleLanguage },
   ]
 
   return (

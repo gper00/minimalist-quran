@@ -2,6 +2,7 @@ import { getAllSurahs } from "@/lib/api"
 import { Header } from "@/components/header"
 import { SurahList } from "@/components/surah-list"
 import { ContinueReading } from "@/components/continue-reading"
+import { DailyVerse } from "@/components/daily-verse"
 import type { Surah } from "@/lib/types"
 
 export default async function HomePage() {
@@ -24,11 +25,12 @@ export default async function HomePage() {
           </div>
         </section>
 
+        <DailyVerse />
         <ContinueReading />
         <SurahList surahs={surahs} />
       </main>
 
-      <footer className="py-12 border-t border-border/10 text-center text-sm text-muted-foreground">
+      <footer className="py-12 pb-32 md:pb-12 border-t border-border/10 text-center text-sm text-muted-foreground">
         <p>© {new Date().getFullYear()} Al-Quran Digital • Minimal & Clean</p>
       </footer>
     </div>
