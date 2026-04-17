@@ -82,7 +82,7 @@ export default function JadwalPage() {
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
 
-      <main className="flex-1 container mx-auto px-4 max-w-2xl py-8 pb-32">
+      <main className="flex-1 container mx-auto px-4 max-w-2xl py-8 pb-56">
         <div className="text-center space-y-2 mb-10 mt-6">
           <h1 className="text-3xl font-black tracking-tight flex items-center justify-center gap-2">
             <Clock className="w-8 h-8 text-primary" />

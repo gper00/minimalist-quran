@@ -13,25 +13,18 @@ export default async function HomePage() {
       <Header />
 
       <main className="container mx-auto px-4 max-w-5xl">
-        {/* Minimalist Hero Section */}
-        <section className="py-16 md:py-24 text-center space-y-6">
-          <div className="space-y-2">
-            <h1 className="text-4xl md:text-6xl font-black tracking-tight text-foreground">
-              Al-Quran <span className="text-primary/40">Digital</span>
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground font-medium max-w-2xl mx-auto">
-              Bacaan yang khusyuk, jernih, dan penuh makna dalam genggaman Anda.
-            </p>
-          </div>
-        </section>
-
-        <DailyVerse />
+        {/* Combined Hero + Continue Reading */}
         <ContinueReading />
+
+        {/* Daily Verse - after hero */}
+        <DailyVerse />
+
+        {/* Surah/Juz List */}
         <SurahList surahs={surahs} />
       </main>
 
-      <footer className="py-12 pb-32 md:pb-12 border-t border-border/10 text-center text-sm text-muted-foreground">
-        <p>© {new Date().getFullYear()} Al-Quran Digital • Minimal & Clean</p>
+      <footer className="py-10 pb-28 md:pb-10 border-t border-border/10 text-center text-xs text-muted-foreground/60">
+        <p>© {new Date().getFullYear()} Al-Quran Digital</p>
       </footer>
     </div>
   )

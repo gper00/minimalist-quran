@@ -40,7 +40,7 @@ export function SurahCard({ surah, mode = "grid" }: SurahCardProps) {
 
   return (
     <Link href={`/surah/${surah.number_of_surah}`} className="group block">
-      <div className="relative h-full p-6 rounded-2xl border border-border/60 bg-card hover:bg-primary/[0.02] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 overflow-hidden">
+      <div className="relative h-full p-6 rounded-2xl border border-border/80 shadow-sm bg-card hover:bg-primary/[0.02] hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 overflow-hidden">
         {/* Background Number Ornament */}
         <div className="absolute -top-4 -left-4 w-24 h-24 bg-primary/5 rounded-full flex items-center justify-center blur-2xl group-hover:bg-primary/10 transition-colors" />
         

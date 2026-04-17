@@ -12,6 +12,7 @@ import { useLanguage } from "@/hooks/use-language"
 import { useAudio } from "@/hooks/use-audio"
 import { TafsirModal } from "./tafsir-modal"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { cn, cleanVerseText } from "@/lib/utils"
 
 interface VerseCardProps {
   verse: Verse
@@ -135,13 +136,7 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir, totalVerses =
   const translation = language === "en" ? verse.translation_en : verse.translation_id
 
   const getVerseText = () => {
-    let text = verse.text
-    if (verse.number === 1 && surahNumber !== 1 && surahNumber !== 9) {
-      // Robust Bismillah removal using Regex to handle variations in spacing/harakat
-      const bismillahRegex = /^بِسْمِ\s+ٱللَّهِ\s+ٱلرَّحْمَٰنِ\s+ٱلرَّحِيمِ\s*/
-      text = text.replace(bismillahRegex, "").trim()
-    }
-    return text
+    return cleanVerseText(verse.text, verse.number, surahNumber)
   }
 
   const exportVerseImage = async (ext: "png" | "jpg") => {
@@ -297,83 +292,21 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir, totalVerses =
 
   return (
     <>
-      <div id={`verse-${verse.number}`} className="verse-card scroll-mt-20 pb-12 border-b border-border/5 mb-4">
-        <div className="flex flex-col gap-8">
-          {/* Header Verse: Number and Actions */}
-          <div className="flex items-center justify-between">
-            <div className="verse-number-wrapper">
-              <div className="verse-number text-primary/80">
+      <div id={`verse-${verse.number}`} className="verse-card scroll-mt-20 relative group hover:bg-muted/5 transition-colors rounded-3xl p-6 md:p-8 border border-transparent hover:border-border/40">
+        <div className="flex flex-col gap-6">
+          {/* Header Verse: Number Only */}
+          <div className="flex items-start justify-between">
+            <div className="verse-number-wrapper !mb-0">
+              <div className="verse-number text-primary">
                 {verse.number}
               </div>
-            </div>
-            
-            <div className="flex items-center gap-2 md:gap-3 opacity-60 hover:opacity-100 transition-opacity flex-wrap justify-end">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleAudio}
-                className={`h-10 w-10 md:h-11 md:w-11 rounded-full ${isPlaying || isLoadingAudio ? "text-primary bg-primary/10" : ""}`}
-                title={isPlaying ? "Hentikan Murottal" : "Putar Murottal"}
-              >
-                {isLoadingAudio ? (
-                  <Loader2 className="w-5 h-5 md:w-5 md:h-5 animate-spin" />
-                ) : isPlaying ? (
-                  <PauseCircle className="w-5 h-5 md:w-5 md:h-5" />
-                ) : (
-                  <PlayCircle className="w-5 h-5 md:w-5 md:h-5" />
-                )}
-              </Button>
-              {tafsir && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={openTafsirModal}
-                  className="h-10 w-10 md:h-11 md:w-11 rounded-full"
-                  title={t("verse.tafsir")}
-                >
-                  <BookOpen className="w-5 h-5 md:w-5 md:h-5" />
-                </Button>
-              )}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-10 w-10 md:h-11 md:w-11 rounded-full" title={t("verse.export") || "Export"}>
-                    <ImageDown className="w-5 h-5 md:w-5 md:h-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-40">
-                  <DropdownMenuItem onClick={() => exportVerseImage("png")} className="cursor-pointer">
-                    PNG Image (1:1)
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => exportVerseImage("jpg")} className="cursor-pointer">
-                    JPG Image (1:1)
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleSaveVerse}
-                className={`h-10 w-10 md:h-11 md:w-11 rounded-full ${isSaved ? "text-rose-500 bg-rose-50/50" : ""}`}
-                title={isSaved ? t("verse.unsave") : t("verse.save")}
-              >
-                {isSaved ? <HeartHandshake className="w-5 h-5 md:w-5 md:h-5" /> : <Heart className="w-5 h-5 md:w-5 md:h-5" />}
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleLastReadBookmark}
-                className={`h-10 w-10 md:h-11 md:w-11 rounded-full ${isLastRead ? "text-primary bg-primary/10" : ""}`}
-                title={t("verse.bookmark")}
-              >
-                {isLastRead ? <BookmarkCheck className="w-5 h-5 md:w-5 md:h-5" /> : <Bookmark className="w-5 h-5 md:w-5 md:h-5" />}
-              </Button>
             </div>
           </div>
 
           {/* Arabic Text */}
-          <div className="w-full">
+          <div className="w-full pt-2">
             <p
-              className="font-arabic text-foreground mb-6 text-right"
+              className="font-arabic text-foreground mb-4 text-right"
               dir="rtl"
               style={{
                 fontSize: `${settings.arabicFontSize}px`,
@@ -386,18 +319,86 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir, totalVerses =
 
           {/* Translation */}
           {settings.showTranslation && (
-            <div className="w-full max-w-2xl">
+            <div className="w-full max-w-2xl bg-muted/20 p-4 rounded-2xl border border-border/20">
               <p
-                className="text-muted-foreground leading-relaxed font-medium text-justify"
+                className="text-muted-foreground leading-relaxed font-medium"
                 style={{
                   fontSize: `${settings.translationFontSize}px`,
                 }}
               >
-                <span className="text-primary/60 mr-3 font-bold text-lg">{verse.number}</span>
                 {translation}
               </p>
             </div>
           )}
+
+          {/* Divider & Action Bar */}
+          <div className="mt-4 pt-4 border-t border-border/30 flex items-center justify-between gap-4">
+             {/* Main Audio Action */}
+             <Button
+                variant="default"
+                size="sm"
+                onClick={toggleAudio}
+                className={`rounded-full px-5 shadow-sm transition-all ${isPlaying || isLoadingAudio ? "bg-primary/90" : "bg-muted text-foreground hover:bg-primary hover:text-primary-foreground"}`}
+                title={isPlaying ? "Hentikan Murottal" : "Putar Murottal"}
+              >
+                {isLoadingAudio ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : isPlaying ? (
+                  <PauseCircle className="w-4 h-4 mr-2" />
+                ) : (
+                  <PlayCircle className="w-4 h-4 mr-2" />
+                )}
+                {isPlaying ? "Jeda" : "Putar"}
+              </Button>
+
+            {/* Secondary Actions */}
+            <div className="flex items-center gap-1 md:gap-2 opacity-60 group-hover:opacity-100 transition-opacity flex-wrap justify-end">
+              {tafsir && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={openTafsirModal}
+                  className="h-10 w-10 rounded-full hover:bg-primary/10 hover:text-primary"
+                  title={t("verse.tafsir")}
+                >
+                  <BookOpen className="w-4 h-4" />
+                </Button>
+              )}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full hover:bg-primary/10 hover:text-primary" title={t("verse.export") || "Export"}>
+                    <ImageDown className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40 rounded-2xl border-border/40 shadow-xl">
+                  <DropdownMenuItem onClick={() => exportVerseImage("png")} className="cursor-pointer rounded-xl m-1">
+                    PNG Image (1:1)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => exportVerseImage("jpg")} className="cursor-pointer rounded-xl m-1">
+                    JPG Image (1:1)
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleSaveVerse}
+                className={`h-10 w-10 rounded-full transition-colors ${isSaved ? "text-rose-500 bg-rose-50/50 hover:bg-rose-100/50" : "hover:text-rose-500 hover:bg-rose-50"}`}
+                title={isSaved ? t("verse.unsave") : t("verse.save")}
+              >
+                {isSaved ? <HeartHandshake className="w-4 h-4" /> : <Heart className="w-4 h-4" />}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleLastReadBookmark}
+                className={`h-10 w-10 rounded-full transition-colors ${isLastRead ? "text-primary bg-primary/10 hover:bg-primary/20" : "hover:text-primary hover:bg-primary/5"}`}
+                title={t("verse.bookmark")}
+              >
+                {isLastRead ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -407,7 +408,7 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir, totalVerses =
           onClose={closeTafsirModal}
           verseNumber={verse.number}
           surahName={surahName}
-          verseText={verse.text}
+          verseText={getVerseText()}
           tafsir={tafsir}
         />
       )}

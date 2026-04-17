@@ -2,16 +2,15 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { BookOpen, X, Clock } from "lucide-react"
+import { BookOpen, X, Clock, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { getLastRead, clearLastRead } from "@/lib/storage"
 import { useLanguage } from "@/hooks/use-language"
 import type { LastRead } from "@/lib/types"
 
 export function ContinueReading() {
   const [lastRead, setLastRead] = useState<LastRead | null>(null)
-  const { t } = useLanguage()
+  const { language, t } = useLanguage()
 
   useEffect(() => {
     setLastRead(getLastRead())
@@ -22,73 +21,78 @@ export function ContinueReading() {
     setLastRead(null)
   }
 
-  if (!lastRead) {
-    return null
-  }
-
   const formatDate = (timestamp: number) => {
     const date = new Date(timestamp)
     const now = new Date()
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
 
     if (diffInHours < 1) {
-      return "Baru saja"
+      return language === "id" ? "Baru saja" : "Just now"
     } else if (diffInHours < 24) {
-      return `${diffInHours} jam yang lalu`
+      return language === "id" ? `${diffInHours} jam yang lalu` : `${diffInHours}h ago`
     } else {
       const diffInDays = Math.floor(diffInHours / 24)
-      return `${diffInDays} hari yang lalu`
+      return language === "id" ? `${diffInDays} hari yang lalu` : `${diffInDays}d ago`
     }
   }
 
   return (
-    <Card className="mb-8 border-primary/20 bg-gradient-to-br from-primary/15 via-primary/5 to-background shadow-lg shadow-primary/5 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/40 transition-all duration-500 overflow-hidden relative group rounded-3xl">
-      {/* Decorative Glow */}
-      <div className="absolute top-0 right-0 p-32 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors duration-500 pointer-events-none" />
-      
-      <CardContent className="p-6 md:p-8 relative z-10">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div className="flex items-start md:items-center space-x-5 flex-1 min-w-0">
-            {/* Animated Icon Wrapper */}
-            <div className="relative w-14 h-14 flex-shrink-0">
-              <div className="absolute inset-0 rounded-2xl bg-primary/20 animate-ping opacity-20" />
-              <div className="relative w-full h-full rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center backdrop-blur-sm">
-                <BookOpen className="w-6 h-6 animate-pulse duration-1000" />
+    <div className="mt-4 md:mt-6 mb-8 md:mb-12 rounded-3xl border border-border/60 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 shadow-sm overflow-hidden">
+      {/* Hero Section */}
+      <div className="mt-8 px-6 md:px-10 pt-10 md:pt-14 pb-6 md:pb-8 text-center">
+        <h1 className="text-2xl md:text-5xl font-black tracking-tight text-foreground mb-2">
+          {language === "id" ? "Al-Quran" : "The Holy Quran"}{" "}
+          <span className="text-primary/40">{language === "id" ? "Digital" : "Digital"}</span>
+        </h1>
+        <p className="text-sm md:text-base text-muted-foreground font-medium max-w-md mx-auto">
+          {language === "id"
+            ? "Bacaan yang khusyuk, jernih, dan penuh makna."
+            : "A serene, clear, and meaningful reading experience."}
+        </p>
+      </div>
+
+      {/* Continue Reading Section */}
+      {lastRead && (
+        <div className="mt-12 mx-4 md:mx-8 mb-4 md:mb-8 p-4 md:p-5 rounded-2xl border border-border/100 relative group">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4 min-w-0 flex-1">
+              <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center flex-shrink-0">
+                <BookOpen className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3 className="font-bold text-foreground text-sm tracking-tight truncate">
+                  {t("home.continue_reading")}
+                </h3>
+                <p className="text-foreground/60 text-xs truncate">
+                  {lastRead.surahName} <span className="mx-1 text-primary/30">•</span> {t("audio.verse")} {lastRead.verseNumber}
+                </p>
+                <div className="flex items-center gap-1 text-[10px] text-muted-foreground/60 mt-0.5">
+                  <Clock className="w-3 h-3" />
+                  <span>{formatDate(lastRead.timestamp)}</span>
+                </div>
               </div>
             </div>
 
-            <div className="space-y-1 min-w-0 flex-1">
-              <h3 className="font-bold text-foreground text-base md:text-lg tracking-tight truncate">
-                {t("home.continue_reading")}
-              </h3>
-              <p className="text-foreground/70 font-medium text-sm truncate">
-                {lastRead.surahName} <span className="mx-1 text-primary/40">•</span> {t("audio.verse")} {lastRead.verseNumber}
-              </p>
-              <div className="flex items-center space-x-1.5 text-xs font-bold text-muted-foreground uppercase tracking-wider pt-1">
-                <Clock className="w-3.5 h-3.5" />
-                <span>{formatDate(lastRead.timestamp)}</span>
-              </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <Button asChild size="sm" className="text-xs shadow-sm shadow-primary/10 rounded-lg px-4 h-9">
+                <Link href={`/surah/${lastRead.surahNumber}#verse-${lastRead.verseNumber}`} className="flex items-center gap-1.5">
+                  {language === "id" ? "Lanjutkan" : "Continue"}
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleClearBookmark}
+                className="h-8 w-8 text-muted-foreground/50 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-colors"
+                title="Hapus penanda"
+              >
+                <X className="w-3.5 h-3.5" />
+              </Button>
             </div>
-          </div>
-
-          <div className="flex items-center gap-3 self-start md:self-center">
-            <Button asChild size="default" className="text-xs md:text-sm shadow-md shadow-primary/20 rounded-xl px-6 transition-transform hover:scale-105">
-              <Link href={`/surah/${lastRead.surahNumber}#verse-${lastRead.verseNumber}`}>
-                Lanjutkan
-              </Link>
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleClearBookmark}
-              className="h-10 w-10 text-muted-foreground hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-colors"
-              title="Hapus penanda"
-            >
-              <X className="w-4.5 h-4.5" />
-            </Button>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   )
 }

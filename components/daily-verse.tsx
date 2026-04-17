@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { Quote, Sparkles } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
 import { useLanguage } from "@/hooks/use-language"
 
 const DAILY_VERSES = [
@@ -59,7 +58,6 @@ export function DailyVerse() {
   const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
-    // Generate random verse based on today's date so it changes exactly once per day
     const today = new Date()
     const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 1000 / 60 / 60 / 24)
     const verseIndex = dayOfYear % DAILY_VERSES.length
@@ -71,39 +69,40 @@ export function DailyVerse() {
   if (!isMounted) return null
 
   return (
-    <Card className="mb-8 border-none overflow-hidden relative group rounded-3xl bg-slate-900 shadow-xl">
-      {/* Decorative Golden Ornaments */}
-      <div className="absolute top-0 right-0 p-32 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-16 -left-16 p-24 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="mb-10 rounded-2xl border border-border/50 bg-muted/30 p-6 md:p-8 relative overflow-hidden">
+      {/* Subtle decorative glow */}
+      <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
       
-      <CardContent className="p-8 md:p-10 relative z-10 text-slate-50 flex gap-6 md:gap-8 flex-col md:flex-row shadow-inner">
+      <div className="relative z-10 flex flex-col md:flex-row gap-6 md:gap-8">
+        {/* Translation side */}
         <div className="flex-1 flex flex-col justify-center">
-          <div className="flex items-center gap-2 mb-4">
-            <Sparkles className="w-5 h-5 text-yellow-400" />
-            <span className="text-xs font-bold uppercase tracking-[0.2em] text-yellow-500/80">
+          <div className="flex items-center gap-2 mb-3">
+            <Sparkles className="w-4 h-4 text-primary/60" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/50">
               {language === "id" ? "Kutipan Hari Ini" : "Daily Verse"}
             </span>
           </div>
           
           <div className="relative">
-            <Quote className="absolute -top-3 -left-4 w-8 h-8 text-white/5 rotate-180" />
-            <p className="text-xl md:text-2xl leading-relaxed font-semibold text-white/90 relative z-10 mb-4">
-              "{language === "id" ? randomVerse.translation.id : randomVerse.translation.en}"
+            <Quote className="absolute -top-2 -left-3 w-6 h-6 text-foreground/5 rotate-180" />
+            <p className="text-base md:text-lg leading-relaxed font-medium text-foreground/80 relative z-10 mb-3">
+              &ldquo;{language === "id" ? randomVerse.translation.id : randomVerse.translation.en}&rdquo;
             </p>
           </div>
           
-          <div className="mt-auto pt-4 flex gap-2 items-center text-sm font-medium text-slate-400">
-            <span className="w-6 h-px bg-slate-600"></span>
+          <div className="flex gap-2 items-center text-xs font-medium text-muted-foreground/60">
+            <span className="w-5 h-px bg-border" />
             {randomVerse.surah} • {language === "id" ? "Ayat" : "Verse"} {randomVerse.verse}
           </div>
         </div>
 
-        <div className="md:w-[40%] flex items-center justify-end border-t md:border-t-0 md:border-l border-slate-700/50 pt-6 md:pt-0 md:pl-8">
-          <p className="font-arabic text-3xl md:text-4xl text-right leading-[1.7] text-yellow-100 drop-shadow-sm">
+        {/* Arabic side */}
+        <div className="md:w-[40%] flex items-center justify-end border-t md:border-t-0 md:border-l border-border/30 pt-5 md:pt-0 md:pl-8">
+          <p className="font-arabic text-2xl md:text-3xl text-right leading-[1.8] text-primary/70">
             {randomVerse.arabic}
           </p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

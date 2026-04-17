@@ -62,7 +62,7 @@ export function QiblaCompass({ latitude, longitude }: QiblaCompassProps) {
 
   const startListening = () => {
     if (window.DeviceOrientationEvent) {
-      window.addEventListener("deviceorientationabsolute", handleOrientation, true)
+      ;(window as any).addEventListener("deviceorientationabsolute", handleOrientation, true)
       // Fallback for devices without absolute orientation event
       window.addEventListener("deviceorientation", handleOrientation, true)
     } else {
@@ -88,7 +88,7 @@ export function QiblaCompass({ latitude, longitude }: QiblaCompassProps) {
 
   useEffect(() => {
     return () => {
-      window.removeEventListener("deviceorientationabsolute", handleOrientation, true)
+      ;(window as any).removeEventListener("deviceorientationabsolute", handleOrientation, true)
       window.removeEventListener("deviceorientation", handleOrientation, true)
     }
   }, [])

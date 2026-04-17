@@ -1,6 +1,5 @@
 "use client"
 
-import { Card, CardContent } from "@/components/ui/card"
 import { useLanguage } from "@/hooks/use-language"
 
 interface BismillahIntroProps {
@@ -19,13 +18,27 @@ export function BismillahIntro({ surahNumber, surahName }: BismillahIntroProps) 
   }
 
   return (
-    <div className="py-20 mb-12 flex flex-col items-center justify-center space-y-6">
-      <p className="font-arabic text-4xl md:text-5xl text-foreground/80 tracking-widest leading-relaxed">
+    <div className="py-10 md:py-14 mb-6 flex flex-col items-center justify-center">
+      {/* Ornamental top */}
+      <div className="flex items-center gap-4 mb-6">
+        <span className="h-px w-16 bg-gradient-to-r from-transparent to-primary/20" />
+        <span className="w-1.5 h-1.5 rounded-full bg-primary/30" />
+        <span className="h-px w-16 bg-gradient-to-l from-transparent to-primary/20" />
+      </div>
+
+      <p className="font-arabic text-3xl md:text-4xl text-foreground/80 tracking-wider leading-relaxed mb-3">
         بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
       </p>
-      <p className="text-sm md:text-base text-muted-foreground/60 font-medium max-w-lg text-center px-4 leading-relaxed tracking-wide">
+      <p className="text-xs md:text-sm text-muted-foreground/50 font-medium max-w-md text-center px-4 leading-relaxed tracking-wide italic">
         {getBismillahTranslation()}
       </p>
+
+      {/* Ornamental bottom */}
+      <div className="flex items-center gap-4 mt-6">
+        <span className="h-px w-16 bg-gradient-to-r from-transparent to-primary/20" />
+        <span className="w-1.5 h-1.5 rounded-full bg-primary/30" />
+        <span className="h-px w-16 bg-gradient-to-l from-transparent to-primary/20" />
+      </div>
     </div>
   )
 }

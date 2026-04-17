@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Card, CardContent } from "@/components/ui/card"
 import { useLanguage } from "@/hooks/use-language"
-import { getSavedVerses, removeSavedVerse, type SavedVerse } from "@/lib/storage"
+import { getSavedVerses, removeSavedVerse } from "@/lib/storage"
+import type { SavedVerse } from "@/lib/types"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
+import { cleanVerseText } from "@/lib/utils"
 
 interface SavedVersesModalProps {
   isOpen: boolean
@@ -48,7 +50,7 @@ export function SavedVersesModal({ isOpen, onClose }: SavedVersesModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl w-[95vw] rounded-3xl p-0 overflow-hidden border border-border/40 bg-background/95 backdrop-blur-xl shadow-2xl">
+      <DialogContent className="max-w-3xl w-[95vw] rounded-3xl p-0 overflow-hidden border border-border/40 bg-background/95 backdrop-blur-xl shadow-2xl">
         <div className="sticky top-0 z-10 px-8 py-6 pb-4 bg-background/80 backdrop-blur-xl border-b border-border/30">
           <DialogHeader className="space-y-1.5 text-left">
             <DialogTitle className="flex items-center space-x-3 text-2xl font-bold tracking-tight text-foreground">
@@ -103,7 +105,7 @@ export function SavedVersesModal({ isOpen, onClose }: SavedVersesModalProps) {
 
                   <div className="space-y-4">
                     <div className="text-right">
-                      <p className="font-arabic text-2xl leading-relaxed text-foreground">{verse.verseText}</p>
+                      <p className="font-arabic text-2xl leading-relaxed text-foreground">{cleanVerseText(verse.verseText, verse.verseNumber, verse.surahNumber)}</p>
                     </div>
                     <div className="text-left bg-background/50 p-4 rounded-xl">
                       <p className="text-sm leading-relaxed font-medium text-muted-foreground">{verse.translation}</p>

@@ -1,6 +1,5 @@
 "use client"
 
-import { Card, CardContent } from "@/components/ui/card"
 import { useLanguage } from "@/hooks/use-language"
 import type { SurahDetail } from "@/lib/types"
 
@@ -18,27 +17,32 @@ export function SurahHeader({ surah }: SurahHeaderProps) {
     return surah.name_translations?.id || surah.name
   }
 
-  const getBismillahTranslation = () => {
-    if (language === "en") {
-      return "In the name of Allah, the Entirely Merciful, the Especially Merciful."
-    }
-    return "Dengan menyebut nama Allah Yang Maha Pemurah lagi Maha Penyayang."
-  }
-
   return (
-    <div className="text-center py-10 md:py-16 mb-8 border-b border-border/10">
-      <div className="space-y-4">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-          {surah.name}
-        </h1>
-        <div className="flex flex-col items-center gap-2">
-          <p className="text-xl md:text-2xl text-muted-foreground font-medium">{getSurahName()}</p>
-          <div className="flex items-center gap-3 text-sm uppercase tracking-widest text-muted-foreground/60 font-semibold">
-            <span>{surah.verses?.length || 0} {t("home.verses")}</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-primary/30" />
-            <span>{surah.type}</span>
-          </div>
-        </div>
+    <div className="text-center py-8 md:py-12 mb-6 relative">
+      {/* Ornamental top line */}
+      <div className="flex items-center justify-center gap-4 mb-6">
+        <span className="h-px w-12 bg-gradient-to-r from-transparent to-primary/30" />
+        <span className="text-primary/40 font-arabic text-2xl">{surah.name_translations?.ar}</span>
+        <span className="h-px w-12 bg-gradient-to-l from-transparent to-primary/30" />
+      </div>
+
+      <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-2">
+        {surah.name}
+      </h1>
+      
+      <p className="text-lg text-muted-foreground font-medium mb-3">{getSurahName()}</p>
+      
+      <div className="flex items-center justify-center gap-3 text-xs uppercase tracking-widest text-muted-foreground/60 font-semibold">
+        <span>{surah.verses?.length || 0} {t("home.verses")}</span>
+        <span className="w-1 h-1 rounded-full bg-primary/40" />
+        <span>{surah.type}</span>
+      </div>
+
+      {/* Bottom ornamental divider */}
+      <div className="flex items-center justify-center gap-3 mt-8">
+        <span className="h-px flex-1 max-w-[80px] bg-gradient-to-r from-transparent to-border/40" />
+        <span className="w-2 h-2 rounded-full bg-primary/20" />
+        <span className="h-px flex-1 max-w-[80px] bg-gradient-to-l from-transparent to-border/40" />
       </div>
     </div>
   )

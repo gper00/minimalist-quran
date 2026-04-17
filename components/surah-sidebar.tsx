@@ -29,14 +29,14 @@ export function SurahSidebar({ surahs }: SurahSidebarProps) {
 
   return (
     <div className="flex flex-col h-full bg-background border-r border-border/10">
-      {/* Integrated Search Box - Clean Style */}
-      <div className="p-5 border-b border-border/10">
+      {/* Integrated Search Box */}
+      <div className="px-3 py-3 border-b border-border/10">
         <div className="relative group">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 transition-colors group-focus-within:text-primary" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/50 transition-colors group-focus-within:text-primary" />
           <input
             type="text"
             placeholder="Cari surah..."
-            className="w-full pl-9 pr-8 bg-muted/20 border-none h-10 rounded-xl focus:bg-muted/40 outline-none text-sm transition-all"
+            className="w-full pl-8 pr-8 bg-muted/20 border-none h-9 rounded-lg focus:bg-muted/40 outline-none text-xs transition-all"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -45,7 +45,7 @@ export function SurahSidebar({ surahs }: SurahSidebarProps) {
 
       {/* Sidebar Content */}
       <div className="flex-1 overflow-y-auto custom-scrollbar">
-        <div className="p-3 space-y-1">
+        <div className="p-2 space-y-0.5">
           {filteredSurahs.map((surah) => {
             const isActive = surah.number_of_surah === currentSurahNumber
             return (
@@ -53,27 +53,27 @@ export function SurahSidebar({ surahs }: SurahSidebarProps) {
                 key={surah.number_of_surah}
                 href={`/surah/${surah.number_of_surah}`}
                 className={`
-                  flex items-center justify-between p-3 rounded-xl transition-all duration-200 group no-underline
+                  flex items-center justify-between py-2.5 px-3 rounded-lg transition-all duration-200 group no-underline
                   ${isActive 
-                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" 
+                    ? "bg-primary/10 text-primary shadow-sm" 
                     : "hover:bg-muted/50 text-foreground/70 hover:text-foreground"}
                 `}
               >
                 <div className="flex items-center gap-3">
                   <span className={`
-                    text-xs font-bold w-6 h-6 flex items-center justify-center rounded-md
-                    ${isActive ? "bg-white/20" : "bg-muted text-muted-foreground"}
+                    text-[10px] font-bold w-6 h-6 flex items-center justify-center rounded-md
+                    ${isActive ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground/80"}
                   `}>
                     {surah.number_of_surah}
                   </span>
                   <div className="flex flex-col">
                     <span className="text-sm font-bold leading-tight">{surah.name}</span>
-                    <span className={`text-[10px] font-medium uppercase tracking-wider ${isActive ? "text-white/70" : "text-muted-foreground"}`}>
+                    <span className={`text-[9px] font-medium uppercase tracking-wider ${isActive ? "text-primary/70" : "text-muted-foreground"}`}>
                       {surah.name_translations.id}
                     </span>
                   </div>
                 </div>
-                <span className={`font-arabic text-lg ${isActive ? "text-white" : "text-foreground/40"}`}>
+                <span className={`font-arabic text-lg ${isActive ? "text-primary" : "text-foreground/40 group-hover:text-foreground/60"}`}>
                   {surah.name_translations.ar}
                 </span>
               </Link>
