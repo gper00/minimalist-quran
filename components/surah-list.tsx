@@ -45,66 +45,57 @@ export function SurahList({ surahs }: SurahListProps) {
   }, [searchQuery])
 
   return (
-    <div className="space-y-8">
-      {/* Tabs */}
-      <div className="flex justify-center mb-4">
-        <div className="bg-muted p-1.5 rounded-2xl flex items-center gap-2 max-w-xs w-full shadow-inner border border-border/40">
+    <div className="space-y-6">
+      {/* Unified Toolbar: Tabs + Search + View Toggle */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-border/10 pb-4">
+        {/* Left: Tabs */}
+        <div className="bg-muted p-1 rounded-xl flex items-center gap-1 shadow-inner border border-border/30 shrink-0">
           <button
             onClick={() => setActiveTab("surah")}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === "surah" ? "bg-background text-primary shadow-sm ring-1 ring-border/50 scale-100" : "text-muted-foreground hover:bg-background/50 hover:text-foreground scale-95 opacity-80"}`}
+            className={`flex items-center gap-1.5 py-2 px-4 rounded-lg text-xs font-bold transition-all duration-200 ${activeTab === "surah" ? "bg-background text-primary shadow-sm ring-1 ring-border/50" : "text-muted-foreground hover:text-foreground"}`}
           >
-            <Book className="w-4 h-4" />
+            <Book className="w-3.5 h-3.5" />
             Surah
           </button>
           <button
             onClick={() => setActiveTab("juz")}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === "juz" ? "bg-background text-primary shadow-sm ring-1 ring-border/50 scale-100" : "text-muted-foreground hover:bg-background/50 hover:text-foreground scale-95 opacity-80"}`}
+            className={`flex items-center gap-1.5 py-2 px-4 rounded-lg text-xs font-bold transition-all duration-200 ${activeTab === "juz" ? "bg-background text-primary shadow-sm ring-1 ring-border/50" : "text-muted-foreground hover:text-foreground"}`}
           >
-            <Layers className="w-4 h-4" />
+            <Layers className="w-3.5 h-3.5" />
             Juz
           </button>
         </div>
-      </div>
 
-      <div className="space-y-6">
-        {/* Toolbar: Results, Search & Toggle */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-border/10 pb-4 gap-4">
-          <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground whitespace-nowrap">
-            {activeTab === "surah"
-              ? (searchQuery ? `${t("search.results")} (${filteredSurahs.length})` : `Daftar Surah (${surahs.length})`)
-              : (searchQuery ? `${t("search.results")} (${filteredJuz.length})` : `Daftar Juz (30)`)
-            }
-          </h2>
+        {/* Right: Search + View Toggle */}
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <SearchBar
+            className="flex-1 sm:w-56"
+            onSearch={setSearchQuery}
+            placeholder={activeTab === "surah" ? "Cari surah..." : "Cari juz..."}
+          />
 
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <SearchBar
-              className="flex-1 sm:w-64"
-              onSearch={setSearchQuery}
-              placeholder={activeTab === "surah" ? "Cari surah..." : "Cari juz..."}
-            />
-
-            <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-xl shrink-0">
-              <Button
-                variant={viewMode === "grid" ? "secondary" : "ghost"}
-                size="icon"
-                onClick={() => setViewMode("grid")}
-                className="h-8 w-8 rounded-lg"
-                title="Grid View"
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </Button>
-              <Button
-                variant={viewMode === "list" ? "secondary" : "ghost"}
-                size="icon"
-                onClick={() => setViewMode("list")}
-                className="h-8 w-8 rounded-lg"
-                title="List View"
-              >
-                <List className="w-4 h-4" />
-              </Button>
-            </div>
+          <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-xl shrink-0">
+            <Button
+              variant={viewMode === "grid" ? "secondary" : "ghost"}
+              size="icon"
+              onClick={() => setViewMode("grid")}
+              className="h-8 w-8 rounded-lg"
+              title="Grid View"
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </Button>
+            <Button
+              variant={viewMode === "list" ? "secondary" : "ghost"}
+              size="icon"
+              onClick={() => setViewMode("list")}
+              className="h-8 w-8 rounded-lg"
+              title="List View"
+            >
+              <List className="w-4 h-4" />
+            </Button>
           </div>
         </div>
+      </div>
 
         {/* Content Container */}
         {activeTab === "surah" ? (
@@ -154,7 +145,6 @@ export function SurahList({ surahs }: SurahListProps) {
             </div>
           )
         )}
-      </div>
     </div>
   )
 }

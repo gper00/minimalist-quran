@@ -7,7 +7,7 @@ import { SettingsProvider } from "@/hooks/use-settings"
 import { LanguageProvider } from "@/hooks/use-language"
 import { AudioProvider } from "@/hooks/use-audio"
 import { Toaster } from "@/components/ui/toaster"
-import { MobileBottomBar } from "@/components/mobile-bottom-bar"
+
 import { GlobalAudioPlayer } from "@/components/global-audio-player"
 
 const workSans = Work_Sans({
@@ -30,9 +30,31 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: "Al-Quran Digital - Bacaan yang Khusyuk",
-  description: "Aplikasi Al-Quran digital minimalis untuk pengalaman membaca yang fokus dan khusyuk saat offline maupun online.",
-  manifest: "/manifest.json",
+  metadataBase: new URL('https://quran.umamalfarizi.is-a.dev'),
+  title: {
+    default: "Al-Quran Digital - Bacaan yang Khusyuk",
+    template: "%s | Al-Quran Digital",
+  },
+  description: "Aplikasi Al-Quran digital minimalis untuk pengalaman membaca yang fokus dan khusyuk. Lengkap dengan terjemahan, tafsir, dan audio murottal.",
+  keywords: ["Al-Quran", "Quran Digital", "Baca Quran Online", "Terjemahan Quran", "Tafsir", "Islamic App", "Murottal"],
+  authors: [{ name: "Umam Alfarizi", url: "https://umamalfarizi.is-a.dev" }],
+  creator: "Umam Alfarizi",
+  openGraph: {
+    type: "website",
+    locale: "id_ID",
+    url: "https://quran.umamalfarizi.is-a.dev",
+    siteName: "Al-Quran Digital",
+    title: "Al-Quran Digital - Bacaan yang Khusyuk",
+    description: "Aplikasi Al-Quran digital minimalis untuk pengalaman membaca yang fokus dan khusyuk.",
+    images: [{ url: "/icon-512x512.png", width: 512, height: 512, alt: "Al-Quran Digital" }],
+  },
+  twitter: {
+    card: "summary",
+    title: "Al-Quran Digital",
+    description: "Bacaan Al-Quran yang khusyuk, jernih, dan penuh makna.",
+    images: ["/icon-512x512.png"],
+  },
+  manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -51,12 +73,10 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap"
-          rel="stylesheet"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Scheherazade+New:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap"
           rel="stylesheet"
         />
         <style>{`
@@ -80,7 +100,7 @@ html {
             <SettingsProvider>
               <AudioProvider>
                 {children}
-                <MobileBottomBar />
+
                 <GlobalAudioPlayer />
                 <Toaster />
               </AudioProvider>

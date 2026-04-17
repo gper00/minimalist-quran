@@ -5,10 +5,9 @@ import { Header } from "@/components/header"
 import { SurahHeader } from "@/components/surah-header"
 import { BismillahIntro } from "@/components/bismillah-intro"
 import { VerseCard } from "@/components/verse-card"
-import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { SurahSidebar } from "@/components/surah-sidebar"
-import { MobileSurahDrawer } from "@/components/mobile-surah-drawer"
+import { MobileSurahHeader } from "@/components/mobile-surah-header"
 import type { SurahDetail, Surah } from "@/lib/types"
 
 interface SurahPageProps {
@@ -37,24 +36,48 @@ export default async function SurahPage({ params }: SurahPageProps) {
   const previousSurah = surahNumber > 1 ? surahNumber - 1 : null
   const nextSurah = surahNumber < 114 ? surahNumber + 1 : null
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Chapter",
+    "name": `Surah ${surahDetail.name}`,
+    "headline": `Surah ${surahDetail.name} (${surahDetail.name_translations?.id || ''})`,
+    "description": `Baca Surah ${surahDetail.name} lengkap dengan terjemahan Indonesia, tafsir, dan audio.`,
+    "position": surahNumber,
+    "isPartOf": {
+      "@type": "CreativeWork",
+      "name": "Al-Quran Digital",
+      "url": "https://quran.umamalfarizi.is-a.dev"
+    }
+  }
+
   return (
-    <div className="h-screen bg-background transition-colors duration-300 overflow-hidden flex flex-col md:flex-row">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <div className="h-screen bg-background transition-colors duration-300 overflow-hidden flex flex-col md:flex-row">
       {/* Sidebar - Desktop only */}
       <aside className="hidden md:block w-72 lg:w-80 flex-shrink-0 h-full bg-muted/30">
         <SurahSidebar surahs={allSurahs} />
       </aside>
 
       <div className="flex-1 flex flex-col h-full overflow-hidden">
-        {/* Navbar */}
-        <div className="flex-none border-b border-border/20 sticky top-0 z-40 bg-muted/20 backdrop-blur-md">
+        {/* Desktop Navbar */}
+        <div className="hidden md:block flex-none border-b border-border/20 sticky top-0 z-40 bg-muted/20 backdrop-blur-md">
           <Header centeredBrand />
+        </div>
+
+        {/* Mobile Navbar - sticky, hides on scroll */}
+        <div className="md:hidden flex-none sticky top-0 z-40">
+          <MobileSurahHeader surahName={surahDetail.name} surahs={allSurahs} />
         </div>
 
         {/* Main Content Area */}
         <main className="flex-1 h-full overflow-y-auto scroll-smooth custom-scrollbar">
-          <div className="px-4 md:px-8 lg:px-12 py-4 md:py-6 pb-56 max-w-5xl mx-auto">
-            {/* Breadcrumb */}
-            <div className="flex items-center justify-between mb-4 md:mb-6">
+          <div className="px-4 md:px-8 lg:px-12 py-4 md:py-6 pb-32 md:pb-16 max-w-5xl mx-auto">
+            {/* Desktop Breadcrumb */}
+            <div className="hidden md:flex items-center justify-between mb-6">
               <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 <Link href="/" className="hover:text-primary transition-colors flex items-center gap-1 group">
                   <ChevronLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
@@ -62,10 +85,6 @@ export default async function SurahPage({ params }: SurahPageProps) {
                 </Link>
                 <span className="opacity-40">/</span>
                 <span className="text-foreground">{surahDetail.name}</span>
-              </div>
-              
-              <div className="md:hidden">
-                <MobileSurahDrawer surahs={allSurahs} />
               </div>
             </div>
 
@@ -126,6 +145,7 @@ export default async function SurahPage({ params }: SurahPageProps) {
         </main>
       </div>
     </div>
+    </>
   )
 }
 
@@ -133,7 +153,6 @@ export async function generateStaticParams() {
   const paths = Array.from({ length: 114 }, (_, i) => ({
     number: (i + 1).toString(),
   }))
-
   return paths
 }
 
@@ -143,13 +162,24 @@ export async function generateMetadata({ params }: SurahPageProps) {
   const surahDetail = await getSurahDetail(surahNumber)
 
   if (!surahDetail) {
-    return {
-      title: "Surah tidak ditemukan",
-    }
+    return { title: "Surah tidak ditemukan" }
   }
 
+  const description = `Baca Surah ${surahDetail.name} (${surahDetail.name_translations?.id || ''}) - ${surahDetail.verses?.length || 0} ayat. Lengkap dengan terjemahan Indonesia, tafsir, dan audio.`
+
   return {
-    title: `${surahDetail.name} - Al-Quran Digital`,
-    description: `Baca Surah ${surahDetail.name} lengkap dengan terjemahan Indonesia dan audio`,
+    title: `Surah ${surahDetail.name}`,
+    description,
+    openGraph: {
+      title: `Surah ${surahDetail.name} - Al-Quran Digital`,
+      description,
+      type: 'article',
+      url: `https://quran.umamalfarizi.is-a.dev/surah/${surahNumber}`,
+    },
+    twitter: {
+      card: 'summary',
+      title: `Surah ${surahDetail.name}`,
+      description,
+    },
   }
 }

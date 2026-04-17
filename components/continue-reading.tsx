@@ -39,7 +39,7 @@ export function ContinueReading() {
   return (
     <div className="mt-4 md:mt-6 mb-8 md:mb-12 rounded-3xl border border-border/60 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 shadow-sm overflow-hidden">
       {/* Hero Section */}
-      <div className="mt-8 px-6 md:px-10 pt-10 md:pt-14 pb-6 md:pb-8 text-center">
+      <div className="mt-8 px-6 md:px-10 pt-10 md:pt-14 pb-14 md:pb-16 text-center">
         <h1 className="text-2xl md:text-5xl font-black tracking-tight text-foreground mb-2">
           {language === "id" ? "Al-Quran" : "The Holy Quran"}{" "}
           <span className="text-primary/40">{language === "id" ? "Digital" : "Digital"}</span>
@@ -53,7 +53,7 @@ export function ContinueReading() {
 
       {/* Continue Reading Section */}
       {lastRead && (
-        <div className="mt-12 mx-4 md:mx-8 mb-4 md:mb-8 p-4 md:p-5 rounded-2xl border border-border/100 relative group">
+        <div className="mx-4 md:mx-8 mb-4 md:mb-8 p-4 md:p-5 rounded-2xl border border-border/100 relative group">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4 min-w-0 flex-1">
               <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center flex-shrink-0">

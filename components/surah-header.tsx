@@ -18,31 +18,56 @@ export function SurahHeader({ surah }: SurahHeaderProps) {
   }
 
   return (
-    <div className="text-center py-8 md:py-12 mb-6 relative">
-      {/* Ornamental top line */}
-      <div className="flex items-center justify-center gap-4 mb-6">
-        <span className="h-px w-12 bg-gradient-to-r from-transparent to-primary/30" />
-        <span className="text-primary/40 font-arabic text-2xl">{surah.name_translations?.ar}</span>
-        <span className="h-px w-12 bg-gradient-to-l from-transparent to-primary/30" />
-      </div>
+    <div className="relative mb-6">
+      <div className="rounded-2xl border border-border/40 bg-muted/20 p-5 md:p-8">
+        {/* Mobile: stacked centered layout */}
+        <div className="flex flex-col items-center text-center md:hidden gap-3">
+          <div className="w-14 h-14 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+            <span className="font-arabic text-2xl text-primary/80">
+              {surah.name_translations?.ar}
+            </span>
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+              {surah.name}
+            </h1>
+            <p className="text-sm text-muted-foreground font-medium mt-0.5">{getSurahName()}</p>
+          </div>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="px-2.5 py-1 rounded-lg bg-background border border-border/50 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              {surah.verses?.length || 0} {t("home.verses")}
+            </span>
+            <span className="px-2.5 py-1 rounded-lg bg-background border border-border/50 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              {surah.type}
+            </span>
+          </div>
+        </div>
 
-      <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-2">
-        {surah.name}
-      </h1>
-      
-      <p className="text-lg text-muted-foreground font-medium mb-3">{getSurahName()}</p>
-      
-      <div className="flex items-center justify-center gap-3 text-xs uppercase tracking-widest text-muted-foreground/60 font-semibold">
-        <span>{surah.verses?.length || 0} {t("home.verses")}</span>
-        <span className="w-1 h-1 rounded-full bg-primary/40" />
-        <span>{surah.type}</span>
-      </div>
-
-      {/* Bottom ornamental divider */}
-      <div className="flex items-center justify-center gap-3 mt-8">
-        <span className="h-px flex-1 max-w-[80px] bg-gradient-to-r from-transparent to-border/40" />
-        <span className="w-2 h-2 rounded-full bg-primary/20" />
-        <span className="h-px flex-1 max-w-[80px] bg-gradient-to-l from-transparent to-border/40" />
+        {/* Desktop: horizontal layout */}
+        <div className="hidden md:flex md:items-center md:justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+              <span className="font-arabic text-3xl text-primary/80">
+                {surah.name_translations?.ar}
+              </span>
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-foreground">
+                {surah.name}
+              </h1>
+              <p className="text-sm text-muted-foreground font-medium mt-0.5">{getSurahName()}</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <span className="px-3 py-1.5 rounded-lg bg-background border border-border/50 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              {surah.verses?.length || 0} {t("home.verses")}
+            </span>
+            <span className="px-3 py-1.5 rounded-lg bg-background border border-border/50 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              {surah.type}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   )

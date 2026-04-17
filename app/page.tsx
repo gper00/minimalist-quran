@@ -8,9 +8,29 @@ import type { Surah } from "@/lib/types"
 export default async function HomePage() {
   const surahs: Surah[] = await getAllSurahs()
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Al-Quran Digital",
+    "url": "https://quran.umamalfarizi.is-a.dev",
+    "description": "Aplikasi Al-Quran digital minimalis untuk pengalaman membaca yang fokus dan khusyuk.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://quran.umamalfarizi.is-a.dev/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <div className="min-h-screen bg-background">
+      <div className="pt-4">
+        <Header />
+      </div>
 
       <main className="container mx-auto px-4 max-w-5xl">
         {/* Combined Hero + Continue Reading */}
@@ -23,10 +43,14 @@ export default async function HomePage() {
         <SurahList surahs={surahs} />
       </main>
 
-      <footer className="py-10 pb-28 md:pb-10 border-t border-border/10 text-center text-xs text-muted-foreground/60">
-        <p>© {new Date().getFullYear()} Al-Quran Digital</p>
+      <footer className="py-8 border-t border-border/10 text-xs text-muted-foreground/60">
+        <div className="container mx-auto max-w-5xl px-4 flex items-center justify-between">
+          <p>© {new Date().getFullYear()} Al-Quran Digital</p>
+          <p>Made with ❤️ by <a href="https://umamalfarizi.is-a.dev" target="_blank" rel="noopener noreferrer" className="font-medium text-primary/60 hover:text-primary transition-colors">Umam Alfarizi</a></p>
+        </div>
       </footer>
     </div>
+    </>
   )
 }
 
