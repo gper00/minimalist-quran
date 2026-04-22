@@ -100,5 +100,4 @@ You are widely welcomed to adapt the logic for your needs without any obligation
 
 ## Contact
 
-Crafted with dedication by **Umam Alfarizi**.
-- **Personal Website:** [https://umamalfarizi.is-a.dev](https://umamalfarizi.is-a.dev)
+Crafted with dedication by [**Umam Alfarizi**](https://umamalfarizi.is-a.dev)
