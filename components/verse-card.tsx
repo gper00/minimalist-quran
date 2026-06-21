@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { BookOpen, Bookmark, BookmarkCheck, Heart, HeartHandshake, ImageDown, PlayCircle, PauseCircle, Loader2 } from "lucide-react"
+import { BookOpen, Bookmark, BookmarkCheck, Heart, HeartHandshake, ImageDown, PlayCircle, PauseCircle, Loader2, Share2, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
@@ -13,6 +13,8 @@ import { useAudio } from "@/hooks/use-audio"
 import { TafsirModal } from "./tafsir-modal"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { cn, cleanVerseText } from "@/lib/utils"
+import { formatVerseForShare, shareToWhatsApp, shareToTwitter, shareToFacebook, copyToClipboard } from "@/lib/share"
+import { ARABIC_FONTS, LATIN_FONTS } from "@/lib/fonts"
 
 interface VerseCardProps {
   verse: Verse
@@ -139,6 +141,31 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir, totalVerses =
     return cleanVerseText(verse.text, verse.number, surahNumber)
   }
 
+  const handleShare = (platform: "whatsapp" | "twitter" | "facebook" | "copy") => {
+    const shareText = formatVerseForShare(getVerseText(), translation, surahName, verse.number)
+    
+    switch (platform) {
+      case "whatsapp":
+        shareToWhatsApp(shareText)
+        break
+      case "twitter":
+        shareToTwitter(shareText)
+        break
+      case "facebook":
+        shareToFacebook(shareText)
+        break
+      case "copy":
+        copyToClipboard(shareText).then((success) => {
+          toast({
+            title: success ? "Berhasil Disalin" : "Gagal Menyalin",
+            description: success ? "Ayat telah disalin ke clipboard" : "Terjadi kesalahan, coba lagi",
+            duration: 2000,
+          })
+        })
+        break
+    }
+  }
+
   const exportVerseImage = async (ext: "png" | "jpg") => {
     try {
       await (document as any).fonts?.ready
@@ -198,9 +225,73 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir, totalVerses =
       ctx.shadowOffsetY = 4
 
       const arabicSize = 48
-      ctx.font = `700 ${arabicSize}px "Amiri", "Scheherazade New", "Noto Naskh Arabic", serif`
+      const arabicFontFamily = ARABIC_FONTS.find(f => f.id === settings.arabicFont)?.family || '"Amiri", serif'
+      const latinFontFamily = LATIN_FONTS.find(f => f.id === settings.latinFont)?.family || 'var(--font-work-sans), sans-serif'
+      ctx.font = `700 ${arabicSize}px ${arabicFontFamily}`
 
-      const arabicY = SIZE / 2 - 130
+      const starCx = SIZE / 2
+      const starCy = 110
+      const starSize = 70
+      
+      ctx.save()
+      ctx.translate(starCx - starSize / 2, starCy - starSize / 2)
+      const scale = starSize / 100
+      ctx.scale(scale, scale)
+      
+      ctx.beginPath()
+      ctx.moveTo(50, 4)
+      ctx.lineTo(61.2257, 15.2257)
+      ctx.lineTo(77.0678, 15.2257)
+      ctx.lineTo(77.0678, 31.0678)
+      ctx.lineTo(88.2935, 42.2935)
+      ctx.lineTo(88.2935, 54)
+      ctx.lineTo(77.0678, 65.2257)
+      ctx.lineTo(77.0678, 81.0678)
+      ctx.lineTo(61.2257, 81.0678)
+      ctx.lineTo(50, 92.2935)
+      ctx.lineTo(38.7743, 81.0678)
+      ctx.lineTo(22.9322, 81.0678)
+      ctx.lineTo(22.9322, 65.2257)
+      ctx.lineTo(11.7065, 54)
+      ctx.lineTo(11.7065, 42.2935)
+      ctx.lineTo(22.9322, 31.0678)
+      ctx.lineTo(22.9322, 15.2257)
+      ctx.lineTo(38.7743, 15.2257)
+      ctx.closePath()
+      
+      ctx.strokeStyle = "#eab308" // Gold color
+      ctx.lineWidth = 3
+      ctx.stroke()
+      ctx.restore()
+
+      ctx.fillStyle = "#eab308"
+      ctx.font = `700 18px ${latinFontFamily}`
+      ctx.textAlign = "center"
+      ctx.textBaseline = "middle"
+      ctx.direction = "ltr" as CanvasDirection
+      ctx.fillText(verse.number.toString(), starCx, starCy)
+
+      const arabicY = SIZE / 2 - 160
+
+      if (verse.number === 1 && surahNumber === 1) {
+        ctx.save()
+        ctx.fillStyle = "rgba(255, 255, 255, 0.9)"
+        ctx.font = `400 28px ${arabicFontFamily}`
+        ctx.direction = "rtl" as CanvasDirection
+        ctx.fillText("بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ", SIZE / 2, arabicY - 75)
+        ctx.restore()
+      }
+
+      ctx.fillStyle = "#ffffff"
+      ctx.textAlign = "center"
+      ctx.textBaseline = "middle"
+      ctx.direction = "rtl" as CanvasDirection
+
+      ctx.shadowColor = "rgba(0, 0, 0, 0.5)"
+      ctx.shadowBlur = 10
+      ctx.shadowOffsetY = 4
+      ctx.font = `700 ${arabicSize}px ${arabicFontFamily}`
+
       const arabicLines = getVerseText().split(" ")
       let arabicLine = ""
       const arabicWrapped: string[] = []
@@ -225,12 +316,19 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir, totalVerses =
 
       ctx.shadowColor = "transparent"
 
+      ctx.strokeStyle = "rgba(234, 179, 8, 0.4)"
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.moveTo(SIZE / 2 - 80, currentY + 15)
+      ctx.lineTo(SIZE / 2 + 80, currentY + 15)
+      ctx.stroke()
+
       // Translation (left-to-right)
       ctx.textAlign = "center"
       ctx.direction = "ltr" as CanvasDirection
       ctx.fillStyle = "rgba(255, 255, 255, 0.85)"
       const translationSize = 17
-      ctx.font = `400 ${translationSize}px "Inter", system-ui, sans-serif`
+      ctx.font = `400 ${translationSize}px ${latinFontFamily}`
 
       const transLines = translation.split(" ")
       let transLine = ""
@@ -247,7 +345,7 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir, totalVerses =
       }
       if (transLine) transWrapped.push(transLine)
 
-      let transY = currentY + 40
+      let transY = currentY + 45
       const lineHeightTranslation = 28
       for (const line of transWrapped) {
         ctx.fillText(line, SIZE / 2, transY)
@@ -256,7 +354,7 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir, totalVerses =
 
       // Surah and verse information
       ctx.fillStyle = "#eab308" // Gold color
-      ctx.font = "600 15px Inter, system-ui, sans-serif"
+      ctx.font = `600 15px ${latinFontFamily}`
       ;(ctx as any).letterSpacing = "2px"
       
       const infoLabel =
@@ -270,7 +368,7 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir, totalVerses =
       // App Watermark / URL
       const url = "Al-Quran Digital · mysimplequran.vercel.app"
       ctx.fillStyle = "rgba(255, 255, 255, 0.3)"
-      ctx.font = "500 13px Inter, system-ui, sans-serif"
+      ctx.font = `500 13px ${latinFontFamily}`
       ctx.fillText(url, SIZE / 2, SIZE - pad + 10)
 
       const mime = ext === "png" ? "image/png" : "image/jpeg"
@@ -310,7 +408,6 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir, totalVerses =
               dir="rtl"
               style={{
                 fontSize: `${settings.arabicFontSize}px`,
-                lineHeight: 2.2,
               }}
             >
               {getVerseText()}
@@ -376,6 +473,27 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir, totalVerses =
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => exportVerseImage("jpg")} className="cursor-pointer rounded-xl m-1">
                     JPG Image (1:1)
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full hover:bg-primary/10 hover:text-primary" title="Share">
+                    <Share2 className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 rounded-2xl border-border/40 shadow-xl">
+                  <DropdownMenuItem onClick={() => handleShare("whatsapp")} className="cursor-pointer rounded-xl m-1">
+                    WhatsApp
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleShare("twitter")} className="cursor-pointer rounded-xl m-1">
+                    Twitter / X
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleShare("facebook")} className="cursor-pointer rounded-xl m-1">
+                    Facebook
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleShare("copy")} className="cursor-pointer rounded-xl m-1">
+                    Salin Teks
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
