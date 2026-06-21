@@ -1,16 +1,18 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { RotateCcw, Palette, Type, Globe, Check } from "lucide-react"
+import { RotateCcw, Palette, Type, Globe, Check, Music, BookOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
 import { useSettings } from "@/hooks/use-settings"
 import { useLanguage } from "@/hooks/use-language"
 import { useTheme } from "next-themes"
+import { useAudio } from "@/hooks/use-audio"
+import { QARIS } from "@/lib/qari"
+import { ARABIC_FONTS, LATIN_FONTS } from "@/lib/fonts"
 
 interface SettingsModalProps {
   isOpen: boolean
@@ -21,19 +23,23 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const { settings, updateSettings, resetSettings } = useSettings()
   const { language, setLanguage, t } = useLanguage()
   const { theme, setTheme } = useTheme()
+  const { currentQariId, setQari } = useAudio()
   const [tempSettings, setTempSettings] = useState(settings)
   const [tempTheme, setTempTheme] = useState<string>("light")
+  const [tempQari, setTempQari] = useState(currentQariId)
 
   useEffect(() => {
     if (isOpen) {
       setTempSettings(settings)
       setTempTheme(theme || "light")
+      setTempQari(currentQariId)
     }
-  }, [isOpen, settings, theme])
+  }, [isOpen, settings, theme, currentQariId])
 
   const handleSave = () => {
     updateSettings(tempSettings)
     setTheme(tempTheme)
+    setQari(tempQari)
     onClose()
   }
 
@@ -46,14 +52,19 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     setTempSettings({
       arabicFontSize: 24,
       translationFontSize: 16,
-      showTranslation: true
+      showTranslation: true,
+      arabicFont: "Amiri",
+      latinFont: "Work Sans",
     })
     setTempTheme("light")
+    setTempQari("alafasy")
+    setQari("alafasy")
   }
 
   const handleCancel = () => {
     setTempSettings(settings)
     setTempTheme(theme || "light")
+    setTempQari(currentQariId)
     onClose()
   }
 
@@ -66,7 +77,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={handleCancel}>
       <DialogContent className="max-w-lg w-[95vw] rounded-3xl p-0 overflow-hidden border border-border/40 bg-background/95 backdrop-blur-xl shadow-2xl">
-        {/* Sticky Header with Glassmorphism */}
+        {/* Sticky Header */}
         <div className="sticky top-0 z-10 px-8 py-6 pb-4 bg-background/80 backdrop-blur-xl border-b border-border/30">
           <DialogHeader className="space-y-1.5 text-left">
             <DialogTitle className="text-2xl font-bold tracking-tight text-foreground">
@@ -78,11 +89,11 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           </DialogHeader>
         </div>
 
-        {/* Scrollable Content Area */}
+        {/* Scrollable Content */}
         <div className="px-8 py-6 space-y-10 max-h-[60vh] overflow-y-auto overflow-x-hidden">
-
           <div className="space-y-8">
-            {/* Theme Selector - Visual Pill Style */}
+
+            {/* Theme Selector */}
             <div className="space-y-4">
               <Label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
                 <Palette className="w-4 h-4" />
@@ -115,6 +126,50 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 <Type className="w-4 h-4" />
                 {t("settings.typography")}
               </Label>
+
+              {/* Arabic Font Family Picker */}
+              <div className="space-y-4 px-1">
+                <Label className="text-sm font-medium">Jenis Font Arab</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {ARABIC_FONTS.map((font) => (
+                    <button
+                      key={font.id}
+                      onClick={() => setTempSettings({ ...tempSettings, arabicFont: font.id })}
+                      className={`
+                        flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all duration-200
+                        ${tempSettings.arabicFont === font.id
+                          ? "border-primary bg-primary/5 ring-2 ring-primary/10"
+                          : "border-transparent bg-muted/50 hover:bg-muted"}
+                      `}
+                    >
+                      <span className="text-lg text-foreground" style={{ fontFamily: font.family }}>بسم الله</span>
+                      <span className="text-[10px] font-medium text-muted-foreground">{font.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Latin Font Family Picker */}
+              <div className="space-y-4 px-1">
+                <Label className="text-sm font-medium">Jenis Font Latin</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {LATIN_FONTS.map((font) => (
+                    <button
+                      key={font.id}
+                      onClick={() => setTempSettings({ ...tempSettings, latinFont: font.id })}
+                      className={`
+                        flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all duration-200
+                        ${tempSettings.latinFont === font.id
+                          ? "border-primary bg-primary/5 ring-2 ring-primary/10"
+                          : "border-transparent bg-muted/50 hover:bg-muted"}
+                      `}
+                    >
+                      <span className="text-sm text-foreground" style={{ fontFamily: font.family }}>Al-Fatiha</span>
+                      <span className="text-[10px] font-medium text-muted-foreground">{font.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
 
               {/* Arabic Font Size */}
               <div className="space-y-4 px-1">
@@ -183,6 +238,29 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   <SelectItem value="en" className="rounded-lg">{t("settings.english")}</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* Audio Settings */}
+            <div className="space-y-4">
+              <Label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <Music className="w-4 h-4" />
+                Pengaturan Audio
+              </Label>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Qari / Pembaca</Label>
+                <Select value={tempQari} onValueChange={setTempQari}>
+                  <SelectTrigger className="h-12 rounded-xl bg-muted/50 border-none px-4">
+                    <SelectValue placeholder="Pilih qari" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-none shadow-xl max-h-60 overflow-auto">
+                    {QARIS.map((qari) => (
+                      <SelectItem key={qari.id} value={qari.id} className="rounded-lg">
+                        {qari.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
         </div>

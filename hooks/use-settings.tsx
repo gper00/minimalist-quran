@@ -6,6 +6,8 @@ interface Settings {
   arabicFontSize: number
   translationFontSize: number
   showTranslation: boolean
+  arabicFont: string
+  latinFont: string
 }
 
 interface SettingsContextType {
@@ -18,6 +20,8 @@ const defaultSettings: Settings = {
   arabicFontSize: 24,
   translationFontSize: 16,
   showTranslation: true,
+  arabicFont: "Amiri",
+  latinFont: "Work Sans",
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined)
@@ -25,7 +29,6 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<Settings>(defaultSettings)
 
-  // Load settings from localStorage on mount
   useEffect(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("quran-settings")
@@ -40,12 +43,32 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  // Save settings to localStorage whenever they change
   useEffect(() => {
     if (typeof window !== "undefined") {
       localStorage.setItem("quran-settings", JSON.stringify(settings))
     }
   }, [settings])
+
+  // Sync font CSS variables with settings for real-time updates
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const arabicMap: Record<string, string> = {
+        'Amiri': '"Amiri"',
+        'Scheherazade New': '"Scheherazade New"',
+        'Noto Naskh Arabic': '"Noto Naskh Arabic"'
+      }
+      const latinMap: Record<string, string> = {
+        'Work Sans': 'var(--font-work-sans)',
+        'Open Sans': 'var(--font-open-sans)'
+      }
+      
+      const arabicValue = arabicMap[settings.arabicFont] || '"Amiri"'
+      const latinValue = latinMap[settings.latinFont] || 'var(--font-work-sans)'
+      
+      document.documentElement.style.setProperty('--font-arabic', arabicValue)
+      document.documentElement.style.setProperty('--font-latin', latinValue)
+    }
+  }, [settings.arabicFont, settings.latinFont])
 
   const updateSettings = (newSettings: Partial<Settings>) => {
     setSettings((prev) => ({ ...prev, ...newSettings }))
