@@ -2,19 +2,21 @@
 
 import { useAudio } from "@/hooks/use-audio"
 import { Button } from "@/components/ui/button"
-import { Play, Pause, SkipForward, SkipBack, X, Loader2, Music4 } from "lucide-react"
+import { Play, Pause, SkipForward, SkipBack, X, Loader2, Music4, ChevronDown } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useLanguage } from "@/hooks/use-language"
+import { QARIS, getQariById } from "@/lib/qari"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 export function GlobalAudioPlayer() {
-  const { status, currentSurah, currentVerse, currentSurahName, pause, resume, playNext, playPrevious, close } = useAudio()
+  const { status, currentSurah, currentVerse, currentSurahName, currentQariId, pause, resume, playNext, playPrevious, close, setQari } = useAudio()
   const { language } = useLanguage()
   const [isVisible, setIsVisible] = useState(false)
 
-  // Smooth slide-in transition
+  const currentQari = getQariById(currentQariId)
+
   useEffect(() => {
     if (status !== "idle" && currentSurah !== null) {
-      // Small timeout allows the component to mount in DOM before sliding up
       setTimeout(() => setIsVisible(true), 10)
     } else {
       setIsVisible(false)
@@ -25,11 +27,11 @@ export function GlobalAudioPlayer() {
 
   return (
     <div 
-      className={`fixed z-[60] left-0 right-0 sm:left-1/2 sm:right-auto sm:w-[400px] sm:-ml-[200px] transition-all duration-500 ease-in-out ${
-        isVisible ? "bottom-[100px] opacity-100 translate-y-0" : "bottom-[-100px] opacity-0 translate-y-10"
-      } px-4 py-2`}
+      className={`fixed bottom-0 left-0 right-0 z-[60] p-4 pb-20 md:p-6 md:pb-6 pointer-events-none flex justify-center transition-all duration-500 ease-in-out ${
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+      }`}
     >
-      <div className="bg-background/80 backdrop-blur-2xl border border-border/40 shadow-2xl shadow-primary/10 rounded-[28px] p-3 flex items-center justify-between gap-4">
+      <div className="bg-background/80 backdrop-blur-2xl border border-border/40 shadow-2xl shadow-primary/10 rounded-[28px] p-3 flex items-center justify-between gap-4 w-full max-w-md pointer-events-auto">
         
         {/* Track Info */}
         <div className="flex items-center gap-3 overflow-hidden ml-2">
@@ -50,9 +52,32 @@ export function GlobalAudioPlayer() {
             <span className="text-sm font-bold truncate pr-4 text-foreground">
               {currentSurahName}
             </span>
-            <span className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground truncate">
-              {language === "id" ? "Ayat" : "Verse"} {currentVerse}
-            </span>
+            <div className="flex items-center gap-1">
+              <span className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground truncate">
+                {language === "id" ? "Ayat" : "Verse"} {currentVerse}
+              </span>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-0.5 text-[10px] font-medium text-primary/70 hover:text-primary transition-colors ml-1">
+                    {currentQari.name.split(" ").slice(0, 2).join(" ")}
+                    <ChevronDown className="w-3 h-3" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-56 rounded-xl border-border/40 shadow-xl max-h-60 overflow-auto">
+                  {QARIS.map((qari) => (
+                    <DropdownMenuItem 
+                      key={qari.id} 
+                      onClick={() => setQari(qari.id)}
+                      className="cursor-pointer rounded-lg text-sm py-2"
+                    >
+                      <span className={currentQariId === qari.id ? "font-bold text-primary" : ""}>
+                        {qari.name}
+                      </span>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
 

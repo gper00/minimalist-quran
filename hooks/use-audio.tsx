@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useRef, useEffect, ReactNode } from "react"
 import { useToast } from "@/hooks/use-toast"
+import { QARIS, DEFAULT_QARI_ID, getQariUrl, getQariById } from "@/lib/qari"
 
 export type AudioStatus = "idle" | "loading" | "playing" | "paused" | "error"
 
@@ -17,12 +18,14 @@ interface AudioContextType {
   currentSurah: number | null
   currentVerse: number | null
   currentSurahName: string | null
+  currentQariId: string
   playVerse: (params: PlayParams) => void
   pause: () => void
   resume: () => void
   playNext: () => void
   playPrevious: () => void
   close: () => void
+  setQari: (qariId: string) => void
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined)
@@ -34,8 +37,21 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   const [currentVerse, setCurrentVerse] = useState<number | null>(null)
   const [currentSurahName, setCurrentSurahName] = useState<string | null>(null)
   const [totalVerses, setTotalVerses] = useState<number>(0)
+  const [currentQariId, setCurrentQariId] = useState<string>(
+    () => {
+      if (typeof window !== "undefined") {
+        return localStorage.getItem("selectedQari") || DEFAULT_QARI_ID
+      }
+      return DEFAULT_QARI_ID
+    }
+  )
   
   const audioRef = useRef<HTMLAudioElement | null>(null)
+
+  const setQari = (qariId: string) => {
+    setCurrentQariId(qariId)
+    localStorage.setItem("selectedQari", qariId)
+  }
 
   // Cleanup audio on unmount
   useEffect(() => {
@@ -49,9 +65,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const buildAudioUrl = (surah: number, verse: number) => {
-    const surahStr = String(surah).padStart(3, '0')
-    const verseStr = String(verse).padStart(3, '0')
-    return `https://everyayah.com/data/Alafasy_128kbps/${surahStr}${verseStr}.mp3`
+    return getQariUrl(currentQariId, surah, verse)
   }
 
   const handleEnded = () => {
@@ -162,8 +176,8 @@ export function AudioProvider({ children }: { children: ReactNode }) {
 
   return (
     <AudioContext.Provider value={{
-      status, currentSurah, currentVerse, currentSurahName, 
-      playVerse, pause, resume, playNext, playPrevious, close
+      status, currentSurah, currentVerse, currentSurahName, currentQariId,
+      playVerse, pause, resume, playNext, playPrevious, close, setQari
     }}>
       {children}
     </AudioContext.Provider>

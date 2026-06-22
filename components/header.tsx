@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Settings, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { SettingsModal } from "./settings-modal"
@@ -18,22 +19,22 @@ export function Header({ centeredBrand = false }: { centeredBrand?: boolean }) {
   return (
     <>
       <header
-        className={`z-50 w-full transition-transform duration-300 bg-background/80 backdrop-blur-md ${isVisible ? "translate-y-0" : "-translate-y-full"}`}
+        className={`z-50 w-full transition-all duration-300 bg-background/80 backdrop-blur-md border-b border-border/10 ${isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"}`}
       >
-        <div className={`flex h-14 items-center justify-between ${centeredBrand ? "px-4 md:px-8" : "container mx-auto max-w-5xl px-4 md:px-6"}`}>
+        <div className={`flex h-16 items-center justify-between ${centeredBrand ? "px-4 md:px-8" : "container mx-auto max-w-5xl px-4 md:px-6"}`}>
           {/* Logo Section */}
-          <div className="flex items-center space-x-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <Link href="/" className="flex items-center space-x-3 group">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
               <span className="text-lg font-black">ق</span>
             </div>
-            <h1 className="text-base font-bold tracking-tight text-foreground">{t("app.title")}</h1>
-          </div>
+            <h1 className="text-lg font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">{t("app.title")}</h1>
+          </Link>
 
           {/* Actions Section */}
-          <div className="flex items-center gap-0.5">
+          <div className="flex items-center gap-1">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-muted/50">
+                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-muted/50">
                   <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">{language}</span>
                 </Button>
               </DropdownMenuTrigger>
@@ -56,7 +57,7 @@ export function Header({ centeredBrand = false }: { centeredBrand?: boolean }) {
             <Button
               variant="ghost"
               size="icon"
-              className="h-9 w-9 rounded-lg hover:bg-muted/50"
+              className="h-9 w-9 rounded-xl hover:bg-muted/50"
               onClick={() => setShowSavedVerses(true)}
               title={t("saved_verses.title")}
             >
@@ -66,7 +67,7 @@ export function Header({ centeredBrand = false }: { centeredBrand?: boolean }) {
             <Button
               variant="ghost"
               size="icon"
-              className="h-9 w-9 rounded-lg hover:bg-muted/50"
+              className="h-9 w-9 rounded-xl hover:bg-muted/50"
               onClick={() => setShowSettings(true)}
               title={t("header.settings")}
             >

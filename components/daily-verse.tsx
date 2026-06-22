@@ -69,14 +69,14 @@ export function DailyVerse() {
   if (!isMounted) return null
 
   return (
-    <div className="mb-10 rounded-2xl border border-border/50 bg-muted/30 p-6 md:p-8 relative overflow-hidden">
+    <div className="mb-10 rounded-3xl border border-border/50 bg-gradient-to-br from-muted/40 via-muted/20 to-transparent p-6 md:p-8 relative overflow-hidden group hover:border-border/80 transition-colors">
       {/* Subtle decorative glow */}
-      <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none group-hover:bg-primary/8 transition-colors" />
       
       <div className="relative z-10 flex flex-col md:flex-row gap-6 md:gap-8">
         {/* Translation side */}
         <div className="flex-1 flex flex-col justify-center">
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-2 mb-4">
             <Sparkles className="w-4 h-4 text-primary/60" />
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/50">
               {language === "id" ? "Kutipan Hari Ini" : "Daily Verse"}
@@ -85,7 +85,7 @@ export function DailyVerse() {
           
           <div className="relative">
             <Quote className="absolute -top-2 -left-3 w-6 h-6 text-foreground/5 rotate-180" />
-            <p className="text-base md:text-lg leading-relaxed font-medium text-foreground/80 relative z-10 mb-3">
+            <p className="text-base md:text-lg leading-relaxed font-medium text-foreground/80 relative z-10 mb-4">
               &ldquo;{language === "id" ? randomVerse.translation.id : randomVerse.translation.en}&rdquo;
             </p>
           </div>
@@ -98,7 +98,7 @@ export function DailyVerse() {
 
         {/* Arabic side */}
         <div className="md:w-[40%] flex items-center justify-end border-t md:border-t-0 md:border-l border-border/30 pt-5 md:pt-0 md:pl-8">
-          <p className="font-arabic text-2xl md:text-3xl text-right leading-[1.8] text-primary/70">
+          <p className="font-arabic text-2xl md:text-3xl text-right leading-[1.8] text-primary/70 group-hover:text-primary/90 transition-colors">
             {randomVerse.arabic}
           </p>
         </div>

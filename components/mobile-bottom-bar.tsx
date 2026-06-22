@@ -42,10 +42,10 @@ export function MobileBottomBar() {
                 key={item.id}
                 onClick={item.onClick}
                 className={cn(
-                  "flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-300",
+                  "flex-1 flex flex-col items-center justify-center py-2.5 px-1 rounded-2xl transition-all duration-300 min-h-[52px]",
                   isActive 
                     ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105" 
-                    : "text-muted-foreground hover:bg-muted/50"
+                    : "text-muted-foreground hover:bg-muted/50 active:scale-95"
                 )}
               >
                 <item.icon className={cn("h-5 w-5 mb-0.5", isActive ? "stroke-[2.5px]" : "stroke-[2px]")} />

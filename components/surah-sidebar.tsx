@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { Search, X, LayoutGrid } from "lucide-react"
@@ -27,16 +27,27 @@ export function SurahSidebar({ surahs }: SurahSidebarProps) {
     )
   }, [surahs, searchQuery])
 
+  useEffect(() => {
+    if (currentSurahNumber) {
+      const activeEl = document.getElementById(`sidebar-surah-${currentSurahNumber}`);
+      if (activeEl) {
+        setTimeout(() => {
+          activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+      }
+    }
+  }, [currentSurahNumber]);
+
   return (
     <div className="flex flex-col h-full bg-background border-r border-border/10">
       {/* Integrated Search Box */}
       <div className="px-3 py-3 border-b border-border/10">
         <div className="relative group">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/50 transition-colors group-focus-within:text-primary" />
-          <input
+          <Input
             type="text"
             placeholder="Cari surah..."
-            className="w-full pl-8 pr-8 bg-muted/20 border-none h-9 rounded-lg focus:bg-muted/40 outline-none text-xs transition-all"
+            className="pl-9 bg-muted/50 border border-border/50 focus-visible:ring-primary/20"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -51,6 +62,7 @@ export function SurahSidebar({ surahs }: SurahSidebarProps) {
             return (
               <Link
                 key={surah.number_of_surah}
+                id={`sidebar-surah-${surah.number_of_surah}`}
                 href={`/surah/${surah.number_of_surah}`}
                 className={`
                   flex items-center justify-between py-2.5 px-3 rounded-lg transition-all duration-200 group no-underline

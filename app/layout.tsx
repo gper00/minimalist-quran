@@ -82,11 +82,35 @@ export default function RootLayout({
         <style>{`
 html {
   font-family: ${openSans.style.fontFamily};
-  --font-sans: ${workSans.variable};
-  --font-body: ${openSans.variable};
+  --font-sans: "Work Sans", sans-serif;
+  --font-body: "Open Sans", sans-serif;
+  --font-arabic: "Amiri";
+  --font-latin: "Work Sans", sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
         `}</style>
+        <script dangerouslySetInnerHTML={{ __html: `
+  (function() {
+    try {
+      var s = JSON.parse(localStorage.getItem('quran-settings') || '{}');
+      if (s.arabicFont) {
+        var arabicMap = {
+          'Amiri': '"Amiri"',
+          'Scheherazade New': '"Scheherazade New"',
+          'Noto Naskh Arabic': '"Noto Naskh Arabic"'
+        };
+        document.documentElement.style.setProperty('--font-arabic', arabicMap[s.arabicFont] || '"Amiri"');
+      }
+      if (s.latinFont) {
+        var latinMap = {
+          'Work Sans': '"Work Sans", sans-serif',
+          'Open Sans': '"Open Sans", sans-serif'
+        };
+        document.documentElement.style.setProperty('--font-latin', latinMap[s.latinFont] || '"Work Sans", sans-serif');
+      }
+    } catch(e) {}
+  })();
+` }} />
       </head>
       <body className={`${workSans.variable} ${openSans.variable} antialiased`}>
         <ThemeProvider

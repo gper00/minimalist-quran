@@ -4,6 +4,7 @@ import { SurahList } from "@/components/surah-list"
 import { ContinueReading } from "@/components/continue-reading"
 import { DailyVerse } from "@/components/daily-verse"
 import type { Surah } from "@/lib/types"
+import { JsonLd } from "@/components/json-ld"
 
 export default async function HomePage() {
   const surahs: Surah[] = await getAllSurahs()
@@ -23,10 +24,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
       <div className="min-h-screen bg-background">
       <div className="pt-4">
         <Header />

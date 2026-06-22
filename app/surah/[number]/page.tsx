@@ -9,6 +9,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import { SurahSidebar } from "@/components/surah-sidebar"
 import { MobileSurahHeader } from "@/components/mobile-surah-header"
 import type { SurahDetail, Surah } from "@/lib/types"
+import { JsonLd } from "@/components/json-ld"
 
 interface SurahPageProps {
   params: Promise<{
@@ -52,28 +53,28 @@ export default async function SurahPage({ params }: SurahPageProps) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <div className="h-screen bg-background transition-colors duration-300 overflow-hidden flex flex-col md:flex-row">
-      {/* Sidebar - Desktop only */}
-      <aside className="hidden md:block w-72 lg:w-80 flex-shrink-0 h-full bg-muted/30">
-        <SurahSidebar surahs={allSurahs} />
-      </aside>
-
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
-        {/* Desktop Navbar */}
+      <JsonLd data={jsonLd} />
+      <div className="h-screen bg-background transition-colors duration-300 overflow-hidden flex flex-col">
+        {/* Desktop Navbar - Full Width at Top */}
         <div className="hidden md:block flex-none border-b border-border/20 sticky top-0 z-40 bg-muted/20 backdrop-blur-md">
           <Header centeredBrand />
         </div>
 
-        {/* Mobile Navbar - sticky, hides on scroll */}
-        <div className="md:hidden flex-none sticky top-0 z-40">
-          <MobileSurahHeader surahName={surahDetail.name} surahs={allSurahs} />
-        </div>
-
         {/* Main Content Area */}
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+          {/* Sidebar - Desktop only */}
+          <aside className="hidden md:block w-72 lg:w-80 flex-shrink-0 h-full bg-muted/30 border-r border-border/10">
+            <SurahSidebar surahs={allSurahs} />
+          </aside>
+
+          {/* Reading Area */}
+          <div className="flex-1 flex flex-col h-full overflow-hidden">
+            {/* Mobile Navbar - sticky, hides on scroll */}
+            <div className="md:hidden flex-none sticky top-0 z-40">
+              <MobileSurahHeader surahName={surahDetail.name} surahs={allSurahs} />
+            </div>
+
+            {/* Main Content Area */}
         <main className="flex-1 h-full overflow-y-auto scroll-smooth custom-scrollbar">
           <div className="px-4 md:px-8 lg:px-12 py-4 md:py-6 pb-32 md:pb-16 max-w-5xl mx-auto">
             {/* Desktop Breadcrumb */}
@@ -101,6 +102,7 @@ export default async function SurahPage({ params }: SurahPageProps) {
                   verse={verse}
                   surahNumber={surahNumber}
                   surahName={surahDetail.name}
+                  surahNameAr={surahDetail.name_translations?.ar}
                   tafsir={surahDetail.tafsir?.id?.kemenag?.text?.[verse.number.toString()]}
                   totalVerses={surahDetail.verses.length}
                 />
@@ -143,8 +145,9 @@ export default async function SurahPage({ params }: SurahPageProps) {
             </div>
           </div>
         </main>
+          </div>
+        </div>
       </div>
-    </div>
     </>
   )
 }

@@ -58,12 +58,12 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         'Noto Naskh Arabic': '"Noto Naskh Arabic"'
       }
       const latinMap: Record<string, string> = {
-        'Work Sans': 'var(--font-work-sans)',
-        'Open Sans': 'var(--font-open-sans)'
+        'Work Sans': '"Work Sans", sans-serif',
+        'Open Sans': '"Open Sans", sans-serif'
       }
       
       const arabicValue = arabicMap[settings.arabicFont] || '"Amiri"'
-      const latinValue = latinMap[settings.latinFont] || 'var(--font-work-sans)'
+      const latinValue = latinMap[settings.latinFont] || '"Work Sans", sans-serif'
       
       document.documentElement.style.setProperty('--font-arabic', arabicValue)
       document.documentElement.style.setProperty('--font-latin', latinValue)

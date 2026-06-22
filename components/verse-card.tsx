@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { BookOpen, Bookmark, BookmarkCheck, Heart, HeartHandshake, ImageDown, PlayCircle, PauseCircle, Loader2, Share2, Check } from "lucide-react"
+import { useState, useEffect } from "react"
+import { BookOpen, Bookmark, BookmarkCheck, Heart, HeartHandshake, PlayCircle, PauseCircle, Loader2, Share2, Check, ImageDown, MoreVertical } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
@@ -15,19 +15,23 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { cn, cleanVerseText } from "@/lib/utils"
 import { formatVerseForShare, shareToWhatsApp, shareToTwitter, shareToFacebook, copyToClipboard } from "@/lib/share"
 import { ARABIC_FONTS, LATIN_FONTS } from "@/lib/fonts"
+import { ShareDialog } from "@/components/share"
+import type { AyahShareData } from "@/types/share"
 
 interface VerseCardProps {
   verse: Verse
   surahNumber: number
   surahName: string
+  surahNameAr?: string
   tafsir?: string
   totalVerses?: number
 }
 
-export function VerseCard({ verse, surahNumber, surahName, tafsir, totalVerses = 0 }: VerseCardProps) {
+export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, totalVerses = 0 }: VerseCardProps) {
   const [showTafsirModal, setShowTafsirModal] = useState(false)
   const [isLastRead, setIsLastRead] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
+  const [shareOpen, setShareOpen] = useState(false)
   
   const { settings } = useSettings()
   const { language, t } = useLanguage()
@@ -57,13 +61,13 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir, totalVerses =
     }
   }
 
-  useState(() => {
+  useEffect(() => {
     const lastRead = getLastRead()
     if (lastRead && lastRead.surahNumber === surahNumber && lastRead.verseNumber === verse.number) {
       setIsLastRead(true)
     }
     setIsSaved(isVerseSaved(surahNumber, verse.number))
-  })
+  }, [surahNumber, verse.number])
 
   const handleLastReadBookmark = () => {
     saveLastRead({
@@ -141,6 +145,15 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir, totalVerses =
     return cleanVerseText(verse.text, verse.number, surahNumber)
   }
 
+  const shareData: AyahShareData = {
+    surahName,
+    surahNameAr: surahNameAr || "",
+    surahNumber,
+    ayahNumber: verse.number,
+    arabicText: getVerseText(),
+    translation,
+  }
+
   const handleShare = (platform: "whatsapp" | "twitter" | "facebook" | "copy") => {
     const shareText = formatVerseForShare(getVerseText(), translation, surahName, verse.number)
     
@@ -166,237 +179,100 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir, totalVerses =
     }
   }
 
-  const exportVerseImage = async (ext: "png" | "jpg") => {
-    try {
-      await (document as any).fonts?.ready
 
-      const SIZE = 1080
-      const canvas = document.createElement("canvas")
-      canvas.width = SIZE
-      canvas.height = SIZE
-      const ctx = canvas.getContext("2d")
-      if (!ctx) return
-
-      // Premium Dark Theme Palette
-      const gradient = ctx.createRadialGradient(SIZE / 2, SIZE / 2, 100, SIZE / 2, SIZE / 2, SIZE)
-      gradient.addColorStop(0, "#1e293b") // slate-800
-      gradient.addColorStop(1, "#0f172a") // slate-900
-
-      // Background
-      ctx.fillStyle = gradient
-      ctx.fillRect(0, 0, SIZE, SIZE)
-
-      // Decorative Circles (Watermark Motif)
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.04)"
-      ctx.lineWidth = 1.5
-      for (let i = 0; i < 6; i++) {
-        ctx.beginPath()
-        ctx.arc(SIZE / 2, SIZE / 2, 280 + i * 70, 0, Math.PI * 2)
-        ctx.stroke()
-      }
-
-      // Elegant Gold Bars
-      const accentGrad = ctx.createLinearGradient(0, 0, SIZE, 0)
-      accentGrad.addColorStop(0, "#ca8a04") // yellow-600
-      accentGrad.addColorStop(0.5, "#fef08a") // yellow-200
-      accentGrad.addColorStop(1, "#ca8a04")
-
-      ctx.fillStyle = accentGrad
-      ctx.fillRect(0, 0, SIZE, 8)
-      ctx.fillRect(0, SIZE - 8, SIZE, 8)
-
-      // Thin inner border
-      ctx.strokeStyle = "rgba(234, 179, 8, 0.2)"
-      ctx.lineWidth = 2
-      ctx.strokeRect(30, 38, SIZE - 60, SIZE - 76)
-
-      // Content area with padding
-      const pad = 64
-      const contentW = SIZE - pad * 2
-
-      // Arabic text (right-to-left, centered)
-      ctx.fillStyle = "#ffffff"
-      ctx.textAlign = "center"
-      ctx.textBaseline = "middle"
-      ctx.direction = "rtl" as CanvasDirection
-
-      ctx.shadowColor = "rgba(0, 0, 0, 0.5)"
-      ctx.shadowBlur = 10
-      ctx.shadowOffsetY = 4
-
-      const arabicSize = 48
-      const arabicFontFamily = ARABIC_FONTS.find(f => f.id === settings.arabicFont)?.family || '"Amiri", serif'
-      const latinFontFamily = LATIN_FONTS.find(f => f.id === settings.latinFont)?.family || 'var(--font-work-sans), sans-serif'
-      ctx.font = `700 ${arabicSize}px ${arabicFontFamily}`
-
-      const starCx = SIZE / 2
-      const starCy = 110
-      const starSize = 70
-      
-      ctx.save()
-      ctx.translate(starCx - starSize / 2, starCy - starSize / 2)
-      const scale = starSize / 100
-      ctx.scale(scale, scale)
-      
-      ctx.beginPath()
-      ctx.moveTo(50, 4)
-      ctx.lineTo(61.2257, 15.2257)
-      ctx.lineTo(77.0678, 15.2257)
-      ctx.lineTo(77.0678, 31.0678)
-      ctx.lineTo(88.2935, 42.2935)
-      ctx.lineTo(88.2935, 54)
-      ctx.lineTo(77.0678, 65.2257)
-      ctx.lineTo(77.0678, 81.0678)
-      ctx.lineTo(61.2257, 81.0678)
-      ctx.lineTo(50, 92.2935)
-      ctx.lineTo(38.7743, 81.0678)
-      ctx.lineTo(22.9322, 81.0678)
-      ctx.lineTo(22.9322, 65.2257)
-      ctx.lineTo(11.7065, 54)
-      ctx.lineTo(11.7065, 42.2935)
-      ctx.lineTo(22.9322, 31.0678)
-      ctx.lineTo(22.9322, 15.2257)
-      ctx.lineTo(38.7743, 15.2257)
-      ctx.closePath()
-      
-      ctx.strokeStyle = "#eab308" // Gold color
-      ctx.lineWidth = 3
-      ctx.stroke()
-      ctx.restore()
-
-      ctx.fillStyle = "#eab308"
-      ctx.font = `700 18px ${latinFontFamily}`
-      ctx.textAlign = "center"
-      ctx.textBaseline = "middle"
-      ctx.direction = "ltr" as CanvasDirection
-      ctx.fillText(verse.number.toString(), starCx, starCy)
-
-      const arabicY = SIZE / 2 - 160
-
-      if (verse.number === 1 && surahNumber === 1) {
-        ctx.save()
-        ctx.fillStyle = "rgba(255, 255, 255, 0.9)"
-        ctx.font = `400 28px ${arabicFontFamily}`
-        ctx.direction = "rtl" as CanvasDirection
-        ctx.fillText("بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ", SIZE / 2, arabicY - 75)
-        ctx.restore()
-      }
-
-      ctx.fillStyle = "#ffffff"
-      ctx.textAlign = "center"
-      ctx.textBaseline = "middle"
-      ctx.direction = "rtl" as CanvasDirection
-
-      ctx.shadowColor = "rgba(0, 0, 0, 0.5)"
-      ctx.shadowBlur = 10
-      ctx.shadowOffsetY = 4
-      ctx.font = `700 ${arabicSize}px ${arabicFontFamily}`
-
-      const arabicLines = getVerseText().split(" ")
-      let arabicLine = ""
-      const arabicWrapped: string[] = []
-      for (const word of arabicLines) {
-        const test = arabicLine ? arabicLine + " " + word : word
-        const { width } = ctx.measureText(test)
-        if (width > contentW * 0.9 && arabicLine) {
-          arabicWrapped.push(arabicLine)
-          arabicLine = word
-        } else {
-          arabicLine = test
-        }
-      }
-      if (arabicLine) arabicWrapped.push(arabicLine)
-
-      const lineHeightArabic = arabicWrapped.length > 3 ? 60 : 72
-      let currentY = arabicY - ((arabicWrapped.length - 1) * lineHeightArabic) / 2
-      for (const line of arabicWrapped) {
-        ctx.fillText(line, SIZE / 2, currentY)
-        currentY += lineHeightArabic
-      }
-
-      ctx.shadowColor = "transparent"
-
-      ctx.strokeStyle = "rgba(234, 179, 8, 0.4)"
-      ctx.lineWidth = 1
-      ctx.beginPath()
-      ctx.moveTo(SIZE / 2 - 80, currentY + 15)
-      ctx.lineTo(SIZE / 2 + 80, currentY + 15)
-      ctx.stroke()
-
-      // Translation (left-to-right)
-      ctx.textAlign = "center"
-      ctx.direction = "ltr" as CanvasDirection
-      ctx.fillStyle = "rgba(255, 255, 255, 0.85)"
-      const translationSize = 17
-      ctx.font = `400 ${translationSize}px ${latinFontFamily}`
-
-      const transLines = translation.split(" ")
-      let transLine = ""
-      const transWrapped: string[] = []
-      for (const word of transLines) {
-        const test = transLine ? transLine + " " + word : word
-        const { width } = ctx.measureText(test)
-        if (width > contentW * 0.95 && transLine) {
-          transWrapped.push(transLine)
-          transLine = word
-        } else {
-          transLine = test
-        }
-      }
-      if (transLine) transWrapped.push(transLine)
-
-      let transY = currentY + 45
-      const lineHeightTranslation = 28
-      for (const line of transWrapped) {
-        ctx.fillText(line, SIZE / 2, transY)
-        transY += lineHeightTranslation
-      }
-
-      // Surah and verse information
-      ctx.fillStyle = "#eab308" // Gold color
-      ctx.font = `600 15px ${latinFontFamily}`
-      ;(ctx as any).letterSpacing = "2px"
-      
-      const infoLabel =
-        language === "id"
-          ? `${surahName.toUpperCase()} • AYAT ${verse.number}`
-          : `${surahName.toUpperCase()} • VERSE ${verse.number}`
-      
-      ctx.fillText(infoLabel, SIZE / 2, transY + 36)
-      ;(ctx as any).letterSpacing = "0px" // Reset
-
-      // App Watermark / URL
-      const url = "Al-Quran Digital · mysimplequran.vercel.app"
-      ctx.fillStyle = "rgba(255, 255, 255, 0.3)"
-      ctx.font = `500 13px ${latinFontFamily}`
-      ctx.fillText(url, SIZE / 2, SIZE - pad + 10)
-
-      const mime = ext === "png" ? "image/png" : "image/jpeg"
-      const quality = ext === "jpg" ? 0.92 : undefined
-      const dataUrl = canvas.toDataURL(mime, quality as any)
-      const link = document.createElement("a")
-      link.href = dataUrl
-      link.download = `${surahName.replace(/\s+/g, "-").toLowerCase()}-${verse.number}-1x1.${ext}`
-      link.click()
-    } catch (e) {
-      console.error("[v0] exportVerseImage error", e)
-      toast({
-        title: t("toast.error") || "Error",
-        description: t("toast.try_again") || "Please try again",
-        duration: 3000,
-      })
-    }
-  }
 
   return (
     <>
-      <div id={`verse-${verse.number}`} className="verse-card scroll-mt-20 relative group hover:bg-muted/5 transition-colors rounded-3xl p-6 md:p-8 border border-transparent hover:border-border/40">
+      <div id={`verse-${verse.number}`} className="verse-card scroll-mt-20 relative group px-2 md:px-8 py-6">
         <div className="flex flex-col gap-6">
-          {/* Header Verse: Number Only */}
-          <div className="flex items-start justify-between">
+          {/* Header Verse: Number & Actions */}
+          <div className="flex items-center justify-between">
             <div className="verse-number-wrapper !mb-0">
               <div className="verse-number text-primary">
                 {verse.number}
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-2 md:gap-4">
+              {/* Main Audio Action */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleAudio}
+                className={`h-10 w-10 rounded-full transition-colors ${isPlaying || isLoadingAudio ? "text-primary bg-primary/10 hover:bg-primary/20" : "hover:text-primary hover:bg-primary/5"}`}
+                title={isPlaying ? "Hentikan Murottal" : "Putar Murottal"}
+              >
+                {isLoadingAudio ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : isPlaying ? (
+                  <PauseCircle className="w-4 h-4" fill="currentColor" />
+                ) : (
+                  <PlayCircle className="w-4 h-4" />
+                )}
+              </Button>
+
+              {/* Secondary Actions - Desktop */}
+              <div className="hidden md:flex items-center gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                {tafsir && (
+                  <Button variant="ghost" size="icon" onClick={openTafsirModal} className="rounded-full hover:text-primary" title={t("verse.tafsir")}>
+                    <BookOpen className="w-4 h-4" />
+                  </Button>
+                )}
+                <Button variant="ghost" size="icon" onClick={() => setShareOpen(true)} className="rounded-full hover:text-primary" title="Export Gambar">
+                  <ImageDown className="w-4 h-4" />
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="rounded-full hover:text-primary" title="Share">
+                      <Share2 className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 rounded-2xl">
+                    <DropdownMenuItem onClick={() => handleShare("whatsapp")} className="cursor-pointer">WhatsApp</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleShare("twitter")} className="cursor-pointer">Twitter / X</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleShare("facebook")} className="cursor-pointer">Facebook</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleShare("copy")} className="cursor-pointer">Salin Teks</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <Button variant="ghost" size="icon" onClick={handleSaveVerse} className={`rounded-full ${isSaved ? "text-rose-500" : "hover:text-rose-500"}`} title={isSaved ? t("verse.unsave") : t("verse.save")}>
+                  {isSaved ? <HeartHandshake className="w-4 h-4" /> : <Heart className="w-4 h-4" />}
+                </Button>
+                <Button variant="ghost" size="icon" onClick={handleLastReadBookmark} className={`rounded-full ${isLastRead ? "text-primary" : "hover:text-primary"}`} title={t("verse.bookmark")}>
+                  {isLastRead ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+                </Button>
+              </div>
+
+              {/* Secondary Actions - Mobile Kebab */}
+              <div className="md:hidden flex items-center opacity-80 group-hover:opacity-100">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="rounded-full h-8 w-8">
+                      <MoreVertical className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 rounded-xl">
+                    {tafsir && (
+                      <DropdownMenuItem onClick={openTafsirModal} className="cursor-pointer gap-2 py-3">
+                        <BookOpen className="w-4 h-4" /> Tafsir Kemenag
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem onClick={() => setShareOpen(true)} className="cursor-pointer gap-2 py-3">
+                      <ImageDown className="w-4 h-4" /> Export Gambar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleShare("copy")} className="cursor-pointer gap-2 py-3">
+                      <Share2 className="w-4 h-4" /> Bagikan Teks
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleSaveVerse} className={`cursor-pointer gap-2 py-3 ${isSaved ? "text-rose-500" : ""}`}>
+                      {isSaved ? <HeartHandshake className="w-4 h-4" /> : <Heart className="w-4 h-4" />} 
+                      {isSaved ? "Hapus Simpanan" : "Simpan Ayat"}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleLastReadBookmark} className={`cursor-pointer gap-2 py-3 ${isLastRead ? "text-primary" : ""}`}>
+                      {isLastRead ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+                      {isLastRead ? "Terakhir Dibaca" : "Tandai Bacaan"}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           </div>
@@ -416,7 +292,7 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir, totalVerses =
 
           {/* Translation */}
           {settings.showTranslation && (
-            <div className="w-full max-w-2xl bg-muted/20 p-4 rounded-2xl border border-border/20">
+            <div className="w-full max-w-2xl mt-4">
               <p
                 className="text-muted-foreground leading-relaxed font-medium"
                 style={{
@@ -428,96 +304,9 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir, totalVerses =
             </div>
           )}
 
-          {/* Divider & Action Bar */}
-          <div className="mt-4 pt-4 border-t border-border/30 flex items-center justify-between gap-4">
-             {/* Main Audio Action */}
-             <Button
-                variant="default"
-                size="sm"
-                onClick={toggleAudio}
-                className={`rounded-full px-5 shadow-sm transition-all ${isPlaying || isLoadingAudio ? "bg-primary/90" : "bg-muted text-foreground hover:bg-primary hover:text-primary-foreground"}`}
-                title={isPlaying ? "Hentikan Murottal" : "Putar Murottal"}
-              >
-                {isLoadingAudio ? (
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                ) : isPlaying ? (
-                  <PauseCircle className="w-4 h-4 mr-2" />
-                ) : (
-                  <PlayCircle className="w-4 h-4 mr-2" />
-                )}
-                {isPlaying ? "Jeda" : "Putar"}
-              </Button>
 
-            {/* Secondary Actions */}
-            <div className="flex items-center gap-1 md:gap-2 opacity-60 group-hover:opacity-100 transition-opacity flex-wrap justify-end">
-              {tafsir && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={openTafsirModal}
-                  className="h-10 w-10 rounded-full hover:bg-primary/10 hover:text-primary"
-                  title={t("verse.tafsir")}
-                >
-                  <BookOpen className="w-4 h-4" />
-                </Button>
-              )}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full hover:bg-primary/10 hover:text-primary" title={t("verse.export") || "Export"}>
-                    <ImageDown className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-40 rounded-2xl border-border/40 shadow-xl">
-                  <DropdownMenuItem onClick={() => exportVerseImage("png")} className="cursor-pointer rounded-xl m-1">
-                    PNG Image (1:1)
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => exportVerseImage("jpg")} className="cursor-pointer rounded-xl m-1">
-                    JPG Image (1:1)
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full hover:bg-primary/10 hover:text-primary" title="Share">
-                    <Share2 className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 rounded-2xl border-border/40 shadow-xl">
-                  <DropdownMenuItem onClick={() => handleShare("whatsapp")} className="cursor-pointer rounded-xl m-1">
-                    WhatsApp
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleShare("twitter")} className="cursor-pointer rounded-xl m-1">
-                    Twitter / X
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleShare("facebook")} className="cursor-pointer rounded-xl m-1">
-                    Facebook
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleShare("copy")} className="cursor-pointer rounded-xl m-1">
-                    Salin Teks
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleSaveVerse}
-                className={`h-10 w-10 rounded-full transition-colors ${isSaved ? "text-rose-500 bg-rose-50/50 hover:bg-rose-100/50" : "hover:text-rose-500 hover:bg-rose-50"}`}
-                title={isSaved ? t("verse.unsave") : t("verse.save")}
-              >
-                {isSaved ? <HeartHandshake className="w-4 h-4" /> : <Heart className="w-4 h-4" />}
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleLastReadBookmark}
-                className={`h-10 w-10 rounded-full transition-colors ${isLastRead ? "text-primary bg-primary/10 hover:bg-primary/20" : "hover:text-primary hover:bg-primary/5"}`}
-                title={t("verse.bookmark")}
-              >
-                {isLastRead ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
-              </Button>
-            </div>
-          </div>
         </div>
+        <hr className="mt-8 border-border/20" />
       </div>
 
       {tafsir && (
@@ -530,6 +319,12 @@ export function VerseCard({ verse, surahNumber, surahName, tafsir, totalVerses =
           tafsir={tafsir}
         />
       )}
+
+      <ShareDialog
+        open={shareOpen}
+        onOpenChange={setShareOpen}
+        data={shareData}
+      />
     </>
   )
 }

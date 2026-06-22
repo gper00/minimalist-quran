@@ -26,16 +26,16 @@ export function MobileSurahHeader({ surahName, surahs }: MobileSurahHeaderProps)
   return (
     <>
       <header
-        className={`w-full border-b border-border/20 bg-background/95 backdrop-blur-md transition-transform duration-300 ${isVisible ? "translate-y-0" : "-translate-y-full"}`}
+        className={`w-full border-b border-border/20 bg-background/95 backdrop-blur-md transition-all duration-300 ${isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"}`}
       >
-        <div className="flex h-12 items-center justify-between px-3">
+        <div className="flex h-14 items-center justify-between px-3">
           {/* Left: Back + Hamburger */}
           <div className="flex items-center gap-1">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => router.back()}
-              className="h-9 w-9 rounded-lg"
+              className="h-10 w-10 rounded-xl"
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
@@ -43,7 +43,7 @@ export function MobileSurahHeader({ surahName, surahs }: MobileSurahHeaderProps)
               variant="ghost"
               size="icon"
               onClick={() => setShowDrawer(true)}
-              className="h-9 w-9 rounded-lg"
+              className="h-10 w-10 rounded-xl"
             >
               <Menu className="h-4 w-4" />
             </Button>
@@ -59,7 +59,7 @@ export function MobileSurahHeader({ surahName, surahs }: MobileSurahHeaderProps)
             <Button
               variant="ghost"
               size="icon"
-              className="h-9 w-9 rounded-lg"
+              className="h-10 w-10 rounded-xl"
               onClick={() => setShowSaved(true)}
             >
               <Heart className="h-4 w-4 opacity-60" />
@@ -67,7 +67,7 @@ export function MobileSurahHeader({ surahName, surahs }: MobileSurahHeaderProps)
             <Button
               variant="ghost"
               size="icon"
-              className="h-9 w-9 rounded-lg"
+              className="h-10 w-10 rounded-xl"
               onClick={() => setShowSettings(true)}
             >
               <Settings className="h-4 w-4 opacity-60" />

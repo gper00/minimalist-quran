@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { RotateCcw, Palette, Type, Globe, Check, Music, BookOpen } from "lucide-react"
+import { RotateCcw, Palette, Type, Globe, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
@@ -11,7 +11,6 @@ import { useSettings } from "@/hooks/use-settings"
 import { useLanguage } from "@/hooks/use-language"
 import { useTheme } from "next-themes"
 import { useAudio } from "@/hooks/use-audio"
-import { QARIS } from "@/lib/qari"
 import { ARABIC_FONTS, LATIN_FONTS } from "@/lib/fonts"
 
 interface SettingsModalProps {
@@ -238,29 +237,6 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   <SelectItem value="en" className="rounded-lg">{t("settings.english")}</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-
-            {/* Audio Settings */}
-            <div className="space-y-4">
-              <Label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                <Music className="w-4 h-4" />
-                Pengaturan Audio
-              </Label>
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Qari / Pembaca</Label>
-                <Select value={tempQari} onValueChange={setTempQari}>
-                  <SelectTrigger className="h-12 rounded-xl bg-muted/50 border-none px-4">
-                    <SelectValue placeholder="Pilih qari" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl border-none shadow-xl max-h-60 overflow-auto">
-                    {QARIS.map((qari) => (
-                      <SelectItem key={qari.id} value={qari.id} className="rounded-lg">
-                        {qari.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
           </div>
         </div>
