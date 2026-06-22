@@ -32,23 +32,7 @@ This project relies on modern web technologies for optimal performance and a sea
 - **[Serwist](https://serwist.pages.dev/)** - Next-generation PWA & Service Worker toolkit
 - **[Radix UI](https://www.radix-ui.com/)** - Unstyled, accessible component primitives
 
----
 
-## Interface Previews
-
-**Surah Reading Mode**
-Elegantly combines the Arabic script with its translation in a parallel, continuous window.
-*(Screenshot placeholder)*
-
-**Beautiful Verse Export**
-Easily export verses with premium themes for Instagram Stories or feeds.
-*(Screenshot placeholder)*
-
-**Detailed Tafsir View**
-Scholarly tafsir explanations are presented in a wide, dedicated overlay for deep immersion.
-*(Screenshot placeholder)*
-
----
 
 ## Installation
 
