@@ -4,21 +4,27 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { BookOpen, X, Clock, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { getLastRead, clearLastRead } from "@/lib/storage"
+import { getLastRead } from "@/lib/storage"
 import { useLanguage } from "@/hooks/use-language"
 import type { LastRead } from "@/lib/types"
 
 export function ContinueReading() {
   const [lastRead, setLastRead] = useState<LastRead | null>(null)
+  const [isHidden, setIsHidden] = useState(false)
   const { language, t } = useLanguage()
 
   useEffect(() => {
+    // Check if user hid this in current session
+    const hidden = sessionStorage.getItem("continue-reading-hidden")
+    if (hidden === "true") {
+      setIsHidden(true)
+    }
     setLastRead(getLastRead())
   }, [])
 
-  const handleClearBookmark = () => {
-    clearLastRead()
-    setLastRead(null)
+  const handleHide = () => {
+    sessionStorage.setItem("continue-reading-hidden", "true")
+    setIsHidden(true)
   }
 
   const formatDate = (timestamp: number) => {
@@ -37,14 +43,17 @@ export function ContinueReading() {
   }
 
   return (
-    <div className="mt-4 md:mt-6 mb-8 md:mb-12 rounded-3xl border border-border/60 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent shadow-sm overflow-hidden">
+    <div className="mt-4 md:mt-6 mb-8 md:mb-12 rounded-3xl border border-border/60 bg-gradient-to-br from-primary/8 via-primary/4 to-transparent shadow-sm overflow-hidden">
       {/* Hero Section */}
-      <div className="mt-8 px-6 md:px-10 pt-10 md:pt-14 pb-14 md:pb-16 text-center">
-        <h1 className="text-2xl md:text-5xl font-black tracking-tight text-foreground mb-2">
+      <div className="mt-8 px-6 md:px-10 pt-10 md:pt-14 pb-14 md:pb-16 text-center relative">
+        {/* Decorative elements */}
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 w-32 h-32 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+        
+        <h1 className="text-3xl md:text-5xl font-black tracking-tight text-foreground mb-3">
           {language === "id" ? "Al-Quran" : "The Holy Quran"}{" "}
-          <span className="text-primary/40">{language === "id" ? "Digital" : "Digital"}</span>
+          <span className="text-primary/30">{language === "id" ? "Digital" : "Digital"}</span>
         </h1>
-        <p className="text-sm md:text-base text-muted-foreground font-medium max-w-md mx-auto">
+        <p className="text-sm md:text-base text-muted-foreground font-medium max-w-md mx-auto leading-relaxed">
           {language === "id"
             ? "Bacaan yang khusyuk, jernih, dan penuh makna."
             : "A serene, clear, and meaningful reading experience."}
@@ -52,7 +61,7 @@ export function ContinueReading() {
       </div>
 
       {/* Continue Reading Section */}
-      {lastRead && (
+      {lastRead && !isHidden && (
         <div className="mx-4 md:mx-8 mb-4 md:mb-8 p-4 md:p-5 rounded-2xl border border-border/100 bg-background/50 backdrop-blur-sm relative group hover:bg-background/80 transition-colors">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4 min-w-0 flex-1">
@@ -83,9 +92,9 @@ export function ContinueReading() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={handleClearBookmark}
+                onClick={handleHide}
                 className="h-8 w-8 text-muted-foreground/50 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-colors"
-                title="Hapus penanda"
+                title="Sembunyikan sementara"
               >
                 <X className="w-3.5 h-3.5" />
               </Button>
