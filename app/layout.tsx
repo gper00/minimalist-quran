@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Work_Sans, Open_Sans } from "next/font/google"
+import { Geist } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { SettingsProvider } from "@/hooks/use-settings"
@@ -10,16 +10,10 @@ import { Toaster } from "@/components/ui/toaster"
 
 import { GlobalAudioPlayer } from "@/components/global-audio-player"
 
-const workSans = Work_Sans({
+const geist = Geist({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-work-sans",
-})
-
-const openSans = Open_Sans({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-open-sans",
+  variable: "--font-geist",
 })
 
 export const viewport: Viewport = {
@@ -81,11 +75,11 @@ export default function RootLayout({
         />
         <style>{`
 html {
-  font-family: ${openSans.style.fontFamily};
-  --font-sans: "Work Sans", sans-serif;
-  --font-body: "Open Sans", sans-serif;
+  font-family: ${geist.style.fontFamily};
+  --font-sans: var(--font-geist), sans-serif;
+  --font-body: var(--font-geist), sans-serif;
   --font-arabic: "Amiri";
-  --font-latin: "Work Sans", sans-serif;
+  --font-latin: var(--font-geist), sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
         `}</style>
@@ -103,16 +97,17 @@ html {
       }
       if (s.latinFont) {
         var latinMap = {
+          'Geist': 'var(--font-geist), sans-serif',
           'Work Sans': '"Work Sans", sans-serif',
           'Open Sans': '"Open Sans", sans-serif'
         };
-        document.documentElement.style.setProperty('--font-latin', latinMap[s.latinFont] || '"Work Sans", sans-serif');
+        document.documentElement.style.setProperty('--font-latin', latinMap[s.latinFont] || 'var(--font-geist), sans-serif');
       }
     } catch(e) {}
   })();
 ` }} />
       </head>
-      <body className={`${workSans.variable} ${openSans.variable} antialiased`}>
+      <body className={`${geist.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

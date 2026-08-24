@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Menu, Heart, Settings, ArrowLeft } from "lucide-react"
+import { Menu, Bookmark, Settings, House } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
@@ -34,10 +34,11 @@ export function MobileSurahHeader({ surahName, surahs }: MobileSurahHeaderProps)
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => router.back()}
+              onClick={() => router.push("/")}
               className="h-10 w-10 rounded-xl"
+              aria-label="Kembali ke Beranda"
             >
-              <ArrowLeft className="h-4 w-4" />
+              <House className="h-4 w-4" />
             </Button>
             <Button
               variant="ghost"
@@ -62,7 +63,7 @@ export function MobileSurahHeader({ surahName, surahs }: MobileSurahHeaderProps)
               className="h-10 w-10 rounded-xl"
               onClick={() => setShowSaved(true)}
             >
-              <Heart className="h-4 w-4 opacity-60" />
+              <Bookmark className="h-4 w-4 opacity-60" />
             </Button>
             <Button
               variant="ghost"
