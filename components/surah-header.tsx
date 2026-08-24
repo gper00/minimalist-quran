@@ -8,7 +8,7 @@ interface SurahHeaderProps {
 }
 
 export function SurahHeader({ surah }: SurahHeaderProps) {
-  const { language, t } = useLanguage()
+  const { language } = useLanguage()
 
   const getSurahName = () => {
     if (language === "en" && surah.name_translations?.en) {
@@ -18,35 +18,22 @@ export function SurahHeader({ surah }: SurahHeaderProps) {
   }
 
   return (
-    <div className="relative mb-2">
-      <div className="py-8 md:py-12">
-        {/* Mobile: stacked centered layout */}
-        <div className="flex flex-col items-center text-center md:hidden gap-2">
-          <h1 className="font-arabic text-4xl font-bold text-foreground">
-            {surah.name_translations?.ar}
-          </h1>
-          <div className="w-1.5 h-1.5 rounded-full bg-primary/30" />
-          <p className="text-lg text-muted-foreground font-medium">
-            {surah.name}
-          </p>
-          <p className="text-sm font-serif italic text-muted-foreground/60">
-            {getSurahName()}
-          </p>
-        </div>
+    <div className="relative mb-6">
+      {/* Decorative glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Desktop: horizontal layout */}
-        <div className="hidden md:flex flex-col items-center text-center gap-2">
-          <h1 className="font-arabic text-5xl font-bold text-foreground">
-            {surah.name_translations?.ar}
-          </h1>
-          <div className="w-1.5 h-1.5 rounded-full bg-primary/30" />
-          <p className="text-xl text-muted-foreground font-medium">
-            {surah.name}
-          </p>
-          <p className="text-sm font-serif italic text-muted-foreground/60">
-            {getSurahName()}
-          </p>
-        </div>
+      <div className="relative z-10 flex flex-col items-center gap-2 py-5 text-center md:gap-3 md:py-8">
+        <h1 className="font-arabic text-3xl font-bold leading-snug text-foreground md:text-5xl">
+          {surah.name_translations?.ar}
+        </h1>
+        <p className="flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground md:text-base">
+          <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary/10 px-1.5 text-[11px] font-bold text-primary md:h-6 md:min-w-6 md:px-2 md:text-xs">
+            {surah.number_of_surah}
+          </span>
+          <span className="font-semibold text-foreground/80">{surah.name}</span>
+          <span aria-hidden className="text-muted-foreground/40">·</span>
+          <span className="font-serif italic text-muted-foreground/70">{getSurahName()}</span>
+        </p>
       </div>
     </div>
   )
