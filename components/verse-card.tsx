@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { BookOpen, Bookmark, BookmarkCheck, Heart, HeartHandshake, PlayCircle, PauseCircle, Loader2, Share2, Check, ImageDown, MoreVertical } from "lucide-react"
+import { BookOpen, Bookmark, BookmarkCheck, PlayCircle, PauseCircle, Loader2, Share2, Check, ImageDown, MoreVertical, History } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
@@ -235,11 +235,11 @@ export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, 
                     <DropdownMenuItem onClick={() => handleShare("copy")} className="cursor-pointer">Salin Teks</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Button variant="ghost" size="icon" onClick={handleSaveVerse} className={`rounded-full ${isSaved ? "text-rose-500" : "hover:text-rose-500"}`} title={isSaved ? t("verse.unsave") : t("verse.save")}>
-                  {isSaved ? <HeartHandshake className="w-4 h-4" /> : <Heart className="w-4 h-4" />}
+                <Button variant="ghost" size="icon" onClick={handleSaveVerse} className={`rounded-full ${isSaved ? "text-primary" : "hover:text-primary"}`} title={isSaved ? t("verse.unsave") : t("verse.save")}>
+                  {isSaved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
                 </Button>
                 <Button variant="ghost" size="icon" onClick={handleLastReadBookmark} className={`rounded-full ${isLastRead ? "text-primary" : "hover:text-primary"}`} title={t("verse.bookmark")}>
-                  {isLastRead ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+                  <History className="w-4 h-4" />
                 </Button>
               </div>
 
@@ -263,12 +263,12 @@ export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, 
                     <DropdownMenuItem onClick={() => handleShare("copy")} className="cursor-pointer gap-2 py-3">
                       <Share2 className="w-4 h-4" /> Bagikan Teks
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleSaveVerse} className={`cursor-pointer gap-2 py-3 ${isSaved ? "text-rose-500" : ""}`}>
-                      {isSaved ? <HeartHandshake className="w-4 h-4" /> : <Heart className="w-4 h-4" />} 
+                    <DropdownMenuItem onClick={handleSaveVerse} className={`cursor-pointer gap-2 py-3 ${isSaved ? "text-primary" : ""}`}>
+                      {isSaved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />} 
                       {isSaved ? "Hapus Simpanan" : "Simpan Ayat"}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleLastReadBookmark} className={`cursor-pointer gap-2 py-3 ${isLastRead ? "text-primary" : ""}`}>
-                      {isLastRead ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+                      <History className="w-4 h-4" />
                       {isLastRead ? "Terakhir Dibaca" : "Tandai Bacaan"}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -278,17 +278,19 @@ export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, 
           </div>
 
           {/* Arabic Text */}
-          <div className="w-full pt-2">
-            <p
-              className="font-arabic text-foreground mb-4 text-right"
-              dir="rtl"
-              style={{
-                fontSize: `${settings.arabicFontSize}px`,
-              }}
-            >
-              {getVerseText()}
-            </p>
-          </div>
+          {settings.showArabicText && (
+            <div className="w-full pt-2">
+              <p
+                className="font-arabic text-foreground mb-4 text-right"
+                dir="rtl"
+                style={{
+                  fontSize: `${settings.arabicFontSize}px`,
+                }}
+              >
+                {getVerseText()}
+              </p>
+            </div>
+          )}
 
           {/* Translation */}
           {settings.showTranslation && (
