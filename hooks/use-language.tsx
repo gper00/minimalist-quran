@@ -39,9 +39,9 @@ const translations = {
     // Verse Actions
     "verse.play": "Putar ayat",
     "verse.tafsir": "Lihat Tafsir",
-    "verse.bookmark": "Tandai sebagai terakhir dibaca",
-    "verse.save": "Simpan ayat",
-    "verse.unsave": "Hapus dari simpanan",
+    "verse.bookmark": "Tandai Terakhir Baca",
+    "verse.save": "Simpan Ayat",
+    "verse.unsave": "Hapus Simpanan",
     "verse.export": "Ekspor Gambar",
     "verse.surah_label": "Surah",
     "verse.verse_label": "Ayat",
@@ -86,11 +86,11 @@ const translations = {
     "audio.verse": "Ayat",
 
     // Saved Verses
-    "saved_verses.title": "Ayat Tersimpan",
+    "saved_verses.title": "Simpan Ayat",
     "saved_verses.description": "Kumpulan ayat yang telah Anda simpan untuk dibaca kembali",
     "saved_verses.empty_description": "Belum ada ayat yang disimpan",
     "saved_verses.no_verses": "Belum ada ayat tersimpan",
-    "saved_verses.start_saving": "Mulai simpan ayat favorit Anda dengan menekan tombol hati",
+    "saved_verses.start_saving": "Mulai simpan ayat favorit Anda dengan menekan ikon bookmark",
     "saved_verses.saved_on": "Disimpan pada",
   },
   en: {
@@ -121,9 +121,9 @@ const translations = {
     // Verse Actions
     "verse.play": "Play verse",
     "verse.tafsir": "View Tafsir",
-    "verse.bookmark": "Mark as last read",
-    "verse.save": "Save verse",
-    "verse.unsave": "Remove from saved",
+    "verse.bookmark": "Mark as Last Read",
+    "verse.save": "Save Verse",
+    "verse.unsave": "Remove from Saved",
     "verse.export": "Export Image",
     "verse.surah_label": "Surah",
     "verse.verse_label": "Verse",
@@ -172,7 +172,7 @@ const translations = {
     "saved_verses.description": "Collection of verses you have saved for future reading",
     "saved_verses.empty_description": "No saved verses yet",
     "saved_verses.no_verses": "No saved verses yet",
-    "saved_verses.start_saving": "Start saving your favorite verses by pressing the heart button",
+    "saved_verses.start_saving": "Start saving your favorite verses by pressing the bookmark icon",
     "saved_verses.saved_on": "Saved on",
   },
 }

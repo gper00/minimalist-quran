@@ -4,7 +4,7 @@ export function formatVerseForShare(
   surahName: string,
   verseNumber: number
 ): string {
-  return `${verseText}\n\n${translation}\n\n— Surah ${surahName}, Ayat ${verseNumber}\n\nAl-Quran Digital`
+  return `${verseText}\n\n${translation}\n\n— Surah ${surahName}, Ayat ${verseNumber}`
 }
 
 export function shareToWhatsApp(text: string): void {

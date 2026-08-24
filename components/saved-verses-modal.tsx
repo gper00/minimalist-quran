@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Heart, Trash2, ExternalLink } from "lucide-react"
+import { Bookmark, Trash2, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Card, CardContent } from "@/components/ui/card"
@@ -54,8 +54,8 @@ export function SavedVersesModal({ isOpen, onClose }: SavedVersesModalProps) {
         <div className="sticky top-0 z-10 px-8 py-6 pb-4 bg-background/80 backdrop-blur-xl border-b border-border/30">
           <DialogHeader className="space-y-1.5 text-left">
             <DialogTitle className="flex items-center space-x-3 text-2xl font-bold tracking-tight text-foreground">
-              <div className="w-10 h-10 rounded-full bg-rose-500/10 flex items-center justify-center">
-                <Heart className="w-5 h-5 text-rose-500 fill-rose-500/20" />
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <Bookmark className="w-5 h-5 text-primary" />
               </div>
               <span>{t("saved_verses.title")}</span>
             </DialogTitle>
@@ -68,7 +68,7 @@ export function SavedVersesModal({ isOpen, onClose }: SavedVersesModalProps) {
         <div className="px-8 py-6 pb-12 space-y-6 max-h-[60vh] overflow-y-auto hidden-scrollbar">
           {savedVerses.length === 0 ? (
             <div className="text-center py-16 bg-muted/20 rounded-3xl border-2 border-dashed border-border/50">
-              <Heart className="w-14 h-14 text-muted-foreground/30 mx-auto mb-4" />
+              <Bookmark className="w-14 h-14 text-muted-foreground/30 mx-auto mb-4" />
               <p className="text-muted-foreground font-medium text-lg">{t("saved_verses.no_verses")}</p>
               <p className="text-sm text-muted-foreground mt-2 opacity-70">{t("saved_verses.start_saving")}</p>
             </div>
