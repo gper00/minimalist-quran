@@ -52,8 +52,9 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       arabicFontSize: 24,
       translationFontSize: 16,
       showTranslation: true,
+      showArabicText: true,
       arabicFont: "Amiri",
-      latinFont: "Work Sans",
+      latinFont: "Geist",
     })
     setTempTheme("light")
     setTempQari("alafasy")
@@ -216,6 +217,23 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   >
                     <span 
                       className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform ${tempSettings.showTranslation ? 'translate-x-6' : 'translate-x-1'}`}
+                    />
+                  </button>
+                </div>
+              </div>
+
+              {/* Show Arabic Text Toggle */}
+              <div className="space-y-4 px-1">
+                <div className="flex justify-between items-center bg-muted/40 p-4 rounded-2xl border border-border/30 hover:bg-muted/60 transition-colors">
+                  <Label className="text-sm font-semibold cursor-pointer" onClick={() => setTempSettings({ ...tempSettings, showArabicText: !tempSettings.showArabicText })}>
+                    Tampilkan Teks Arab
+                  </Label>
+                  <button 
+                    onClick={() => setTempSettings({ ...tempSettings, showArabicText: !tempSettings.showArabicText })}
+                    className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${tempSettings.showArabicText ? 'bg-primary' : 'bg-muted-foreground/30'}`}
+                  >
+                    <span 
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform ${tempSettings.showArabicText ? 'translate-x-6' : 'translate-x-1'}`}
                     />
                   </button>
                 </div>

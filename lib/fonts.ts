@@ -5,6 +5,7 @@ export const ARABIC_FONTS = [
 ] as const
 
 export const LATIN_FONTS = [
+  { id: "Geist", name: "Geist", family: 'var(--font-geist), sans-serif', style: "Clean & Modern" },
   { id: "Work Sans", name: "Work Sans", family: '"Work Sans", sans-serif', style: "Geometric & Modern" },
   { id: "Open Sans", name: "Open Sans", family: '"Open Sans", sans-serif', style: "Humanist & Readable" },
 ] as const

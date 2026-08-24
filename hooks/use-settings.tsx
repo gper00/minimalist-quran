@@ -6,6 +6,7 @@ interface Settings {
   arabicFontSize: number
   translationFontSize: number
   showTranslation: boolean
+  showArabicText: boolean
   arabicFont: string
   latinFont: string
 }
@@ -20,8 +21,9 @@ const defaultSettings: Settings = {
   arabicFontSize: 24,
   translationFontSize: 16,
   showTranslation: true,
+  showArabicText: true,
   arabicFont: "Amiri",
-  latinFont: "Work Sans",
+  latinFont: "Geist",
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined)
@@ -58,6 +60,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         'Noto Naskh Arabic': '"Noto Naskh Arabic"'
       }
       const latinMap: Record<string, string> = {
+        'Geist': 'var(--font-geist), sans-serif',
         'Work Sans': '"Work Sans", sans-serif',
         'Open Sans': '"Open Sans", sans-serif'
       }
