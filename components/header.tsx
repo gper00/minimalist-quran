@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Settings, Heart } from "lucide-react"
+import { Settings, Bookmark } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { SettingsModal } from "./settings-modal"
 import { SavedVersesModal } from "./saved-verses-modal"
@@ -11,7 +11,7 @@ import { useHideOnScroll } from "@/hooks/use-hide-on-scroll"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 export function Header({ centeredBrand = false }: { centeredBrand?: boolean }) {
-  const { language, setLanguage, t } = useLanguage()
+  const { t } = useLanguage()
   const [showSettings, setShowSettings] = useState(false)
   const [showSavedVerses, setShowSavedVerses] = useState(false)
   const isVisible = useHideOnScroll()
@@ -32,28 +32,6 @@ export function Header({ centeredBrand = false }: { centeredBrand?: boolean }) {
 
           {/* Actions Section */}
           <div className="flex items-center gap-1">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-muted/50">
-                  <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">{language}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40 rounded-xl border-none shadow-xl">
-                <DropdownMenuItem
-                  onClick={() => setLanguage("id")}
-                  className={`rounded-lg cursor-pointer ${language === "id" ? "bg-primary/10 text-primary font-bold" : ""}`}
-                >
-                  Indonesian
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setLanguage("en")}
-                  className={`rounded-lg cursor-pointer ${language === "en" ? "bg-primary/10 text-primary font-bold" : ""}`}
-                >
-                  English
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
             <Button
               variant="ghost"
               size="icon"
@@ -61,7 +39,7 @@ export function Header({ centeredBrand = false }: { centeredBrand?: boolean }) {
               onClick={() => setShowSavedVerses(true)}
               title={t("saved_verses.title")}
             >
-              <Heart className="h-4 w-4 opacity-60" />
+              <Bookmark className="h-4 w-4 opacity-60" />
             </Button>
 
             <Button
