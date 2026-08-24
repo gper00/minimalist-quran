@@ -36,11 +36,13 @@ export function TafsirModal({ isOpen, onClose, verseNumber, surahName, verseText
           
           {/* Highlighted Arabic Verse */}
           <div className="p-6 bg-muted/40 rounded-2xl border border-border/30 shadow-inner">
-            <p className="font-arabic text-2xl leading-relaxed text-right text-foreground mb-4">{verseText}</p>
-            <div className="text-center">
+            <p className="font-arabic text-2xl leading-relaxed text-right text-foreground mb-4" dir="rtl">{verseText}</p>
+            <div className="flex items-center justify-center gap-2">
+              <div className="h-px flex-1 bg-border/30" />
               <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-bold text-sm">
                 {verseNumber}
               </span>
+              <div className="h-px flex-1 bg-border/30" />
             </div>
           </div>
 
