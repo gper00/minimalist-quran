@@ -31,7 +31,7 @@ export function GlobalAudioPlayer() {
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
       }`}
     >
-      <div className="bg-background/80 backdrop-blur-2xl border border-border/40 shadow-2xl shadow-primary/10 rounded-[28px] p-3 flex items-center justify-between gap-4 w-full max-w-md pointer-events-auto">
+      <div className="glass-strong border border-border/40 shadow-2xl shadow-primary/10 rounded-[28px] p-3 flex items-center justify-between gap-4 w-full max-w-md pointer-events-auto">
         
         {/* Track Info */}
         <div className="flex items-center gap-3 overflow-hidden ml-2">

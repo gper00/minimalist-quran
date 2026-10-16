@@ -25,10 +25,13 @@ interface VerseCardProps {
   surahNameAr?: string
   tafsir?: string
   totalVerses?: number
+  surahVerses?: Verse[]
+  tafsirMap?: Record<string, string>
 }
 
-export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, totalVerses = 0 }: VerseCardProps) {
+export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, totalVerses = 0, surahVerses, tafsirMap }: VerseCardProps) {
   const [showTafsirModal, setShowTafsirModal] = useState(false)
+  const [tafsirVerse, setTafsirVerse] = useState(verse.number)
   const [isLastRead, setIsLastRead] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
   const [shareOpen, setShareOpen] = useState(false)
@@ -132,6 +135,7 @@ export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, 
   }
 
   const openTafsirModal = () => {
+    setTafsirVerse(verse.number)
     setShowTafsirModal(true)
   }
 
@@ -144,6 +148,16 @@ export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, 
   const getVerseText = () => {
     return cleanVerseText(verse.text, verse.number, surahNumber)
   }
+
+  // Tafsir navigation (prev/next verse inside the modal)
+  const verseNumbers = surahVerses?.map((v) => v.number) ?? []
+  const tafsirIndex = verseNumbers.indexOf(tafsirVerse)
+  const canNavigateTafsir = verseNumbers.length > 0 && tafsirIndex !== -1
+  const activeVerse = surahVerses?.find((v) => v.number === tafsirVerse)
+  const activeTafsirText = tafsirMap?.[tafsirVerse.toString()]
+  const activeVerseText = activeVerse
+    ? cleanVerseText(activeVerse.text, activeVerse.number, surahNumber)
+    : getVerseText()
 
   const shareData: AyahShareData = {
     surahName,
@@ -183,7 +197,7 @@ export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, 
 
   return (
     <>
-      <div id={`verse-${verse.number}`} className="verse-card scroll-mt-20 relative group px-2 md:px-8 py-6">
+      <div id={`verse-${verse.number}`} className="verse-card scroll-mt-20 relative group px-2 md:px-8 py-6 rounded-2xl">
         <div className="flex flex-col gap-6">
           {/* Header Verse: Number & Actions */}
           <div className="flex items-center justify-between">
@@ -265,11 +279,11 @@ export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, 
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleSaveVerse} className={`cursor-pointer gap-2 py-3 ${isSaved ? "text-primary" : ""}`}>
                       {isSaved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />} 
-                      {isSaved ? "Hapus Simpanan" : "Simpan Ayat"}
+                      {isSaved ? t("verse.unsave") : t("verse.save")}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleLastReadBookmark} className={`cursor-pointer gap-2 py-3 ${isLastRead ? "text-primary" : ""}`}>
                       <History className="w-4 h-4" />
-                      {isLastRead ? "Terakhir Dibaca" : "Tandai Bacaan"}
+                      {isLastRead ? t("verse.marked_last_read") : t("verse.bookmark")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -294,7 +308,7 @@ export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, 
 
           {/* Translation */}
           {settings.showTranslation && (
-            <div className="w-full max-w-2xl mt-4">
+            <div className="w-full mt-4">
               <p
                 className="text-muted-foreground leading-relaxed font-medium"
                 style={{
@@ -315,10 +329,14 @@ export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, 
         <TafsirModal
           isOpen={showTafsirModal}
           onClose={closeTafsirModal}
-          verseNumber={verse.number}
+          verseNumber={tafsirVerse}
           surahName={surahName}
-          verseText={getVerseText()}
-          tafsir={tafsir}
+          verseText={activeVerseText}
+          tafsir={activeTafsirText ?? ""}
+          hasPrev={canNavigateTafsir && tafsirIndex > 0}
+          hasNext={canNavigateTafsir && tafsirIndex < verseNumbers.length - 1}
+          onPrev={canNavigateTafsir ? () => setTafsirVerse(verseNumbers[tafsirIndex - 1]) : undefined}
+          onNext={canNavigateTafsir ? () => setTafsirVerse(verseNumbers[tafsirIndex + 1]) : undefined}
         />
       )}
 

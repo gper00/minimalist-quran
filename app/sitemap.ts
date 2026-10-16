@@ -1,21 +1,22 @@
-import { MetadataRoute } from 'next'
+import type { MetadataRoute } from "next"
+import { SITE_URL } from "@/lib/site"
 
-const BASE_URL = 'https://quran.umamalfarizi.is-a.dev'
+const lastModified = new Date()
 
 export default function sitemap(): MetadataRoute.Sitemap {
   // Generate surah pages
   const surahPages = Array.from({ length: 114 }, (_, i) => ({
-    url: `${BASE_URL}/surah/${i + 1}`,
-    lastModified: new Date(),
-    changeFrequency: 'monthly' as const,
+    url: `${SITE_URL}/surah/${i + 1}`,
+    lastModified,
+    changeFrequency: "monthly" as const,
     priority: 0.8,
   }))
 
   return [
     {
-      url: BASE_URL,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
+      url: SITE_URL,
+      lastModified,
+      changeFrequency: "daily",
       priority: 1.0,
     },
     ...surahPages,

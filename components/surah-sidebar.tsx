@@ -39,7 +39,7 @@ export function SurahSidebar({ surahs }: SurahSidebarProps) {
   }, [currentSurahNumber]);
 
   return (
-    <div className="flex flex-col h-full bg-background border-r border-border/10">
+    <div className="flex flex-col h-full glass border-r border-border/10">
       {/* Integrated Search Box */}
       <div className="px-3 py-3 border-b border-border/10">
         <div className="relative group">

@@ -1,12 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Quote, Sparkles } from "lucide-react"
+import Link from "next/link"
+import { Quote, Sparkles, ArrowRight } from "lucide-react"
 import { useLanguage } from "@/hooks/use-language"
 
 const DAILY_VERSES = [
   {
     surah: "Al-Baqarah",
+    surahNumber: 2,
     verse: 286,
     arabic: "لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا",
     translation: {
@@ -16,6 +18,7 @@ const DAILY_VERSES = [
   },
   {
     surah: "Ash-Sharh",
+    surahNumber: 94,
     verse: 5,
     arabic: "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا",
     translation: {
@@ -25,6 +28,7 @@ const DAILY_VERSES = [
   },
   {
     surah: "Ar-Rahman",
+    surahNumber: 55,
     verse: 13,
     arabic: "فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ",
     translation: {
@@ -34,6 +38,7 @@ const DAILY_VERSES = [
   },
   {
     surah: "Ash-Shu'ara",
+    surahNumber: 26,
     verse: 80,
     arabic: "وَإِذَا مَرِضْتُ فَهُوَ يَشْفِينِ",
     translation: {
@@ -43,6 +48,7 @@ const DAILY_VERSES = [
   },
   {
     surah: "At-Talaq",
+    surahNumber: 65,
     verse: 3,
     arabic: "وَيَرْزُقْهُ مِنْ حَيْثُ لَا يَحْتَسِبُ ۚ وَمَنْ يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ",
     translation: {
@@ -69,7 +75,7 @@ export function DailyVerse() {
   if (!isMounted) return null
 
   return (
-    <div className="mb-10 rounded-3xl border border-border/50 bg-gradient-to-br from-muted/40 via-muted/20 to-transparent p-6 md:p-8 relative overflow-hidden group hover:border-border/80 transition-colors">
+    <div className="mb-10 rounded-3xl border border-border/40 glass p-6 md:p-8 relative overflow-hidden group hover:border-border/70 transition-colors">
       {/* Subtle decorative glow */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none group-hover:bg-primary/8 transition-colors" />
       
@@ -94,6 +100,14 @@ export function DailyVerse() {
             <span className="w-5 h-px bg-border" />
             {randomVerse.surah} • {language === "id" ? "Ayat" : "Verse"} {randomVerse.verse}
           </div>
+
+          <Link
+            href={`/surah/${randomVerse.surahNumber}#verse-${randomVerse.verse}`}
+            className="group/link mt-4 inline-flex w-fit items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary/80 transition-colors hover:bg-primary/10 hover:text-primary"
+          >
+            {language === "id" ? "Baca ayat lengkap" : "Read full verse"}
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/link:translate-x-0.5" />
+          </Link>
         </div>
 
         {/* Arabic side */}

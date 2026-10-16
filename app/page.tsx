@@ -5,6 +5,7 @@ import { ContinueReading } from "@/components/continue-reading"
 import { DailyVerse } from "@/components/daily-verse"
 import type { Surah } from "@/lib/types"
 import { JsonLd } from "@/components/json-ld"
+import { SITE_NAME, SITE_URL } from "@/lib/site"
 
 export default async function HomePage() {
   const surahs: Surah[] = await getAllSurahs()
@@ -12,12 +13,13 @@ export default async function HomePage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "Al-Quran Digital",
-    "url": "https://quran.umamalfarizi.is-a.dev",
+    "name": SITE_NAME,
+    "url": SITE_URL,
     "description": "Aplikasi Al-Quran digital minimalis untuk pengalaman membaca yang fokus dan khusyuk.",
+    "inLanguage": "id-ID",
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://quran.umamalfarizi.is-a.dev/?q={search_term_string}",
+      "target": `${SITE_URL}/?q={search_term_string}`,
       "query-input": "required name=search_term_string"
     }
   }
@@ -25,12 +27,12 @@ export default async function HomePage() {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <div className="min-h-screen bg-background">
-      <div className="pt-4">
-        <Header />
+      <div className="min-h-screen">
+      <div className="pt-2 md:pt-6">
+        <Header transparent />
       </div>
 
-      <main className="container mx-auto px-4 max-w-5xl">
+      <main className="container mx-auto px-3 max-w-5xl md:px-4">
         {/* Combined Hero + Continue Reading */}
         <ContinueReading />
 
@@ -41,7 +43,7 @@ export default async function HomePage() {
         <SurahList surahs={surahs} />
       </main>
 
-      <footer className="py-8 border-t border-border/10 text-xs text-muted-foreground/60">
+      <footer className="pt-8 pb-24 md:py-8 border-t border-border/10 text-xs text-muted-foreground/60">
         <div className="container mx-auto max-w-5xl px-4 flex items-center justify-between">
           <p>© {new Date().getFullYear()} Al-Quran Digital</p>
           <p>Made with ❤️ by <a href="https://umamalfarizi.is-a.dev" target="_blank" rel="noopener noreferrer" className="font-medium text-primary/60 hover:text-primary transition-colors">Umam Alfarizi</a></p>
@@ -55,4 +57,7 @@ export default async function HomePage() {
 export const metadata = {
   title: "Al-Quran Digital - Daftar Surah",
   description: "Daftar lengkap 114 surah dalam Al-Quran dengan terjemahan dan audio",
+  alternates: {
+    canonical: "/",
+  },
 }

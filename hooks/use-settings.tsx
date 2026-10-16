@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
+import { ARABIC_FONT_MAP, LATIN_FONT_MAP } from "@/lib/fonts"
 
 interface Settings {
   arabicFontSize: number
@@ -54,22 +55,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   // Sync font CSS variables with settings for real-time updates
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const arabicMap: Record<string, string> = {
-        'Amiri': '"Amiri"',
-        'Scheherazade New': '"Scheherazade New"',
-        'Noto Naskh Arabic': '"Noto Naskh Arabic"'
-      }
-      const latinMap: Record<string, string> = {
-        'Geist': 'var(--font-geist), sans-serif',
-        'Work Sans': '"Work Sans", sans-serif',
-        'Open Sans': '"Open Sans", sans-serif'
-      }
-      
-      const arabicValue = arabicMap[settings.arabicFont] || '"Amiri"'
-      const latinValue = latinMap[settings.latinFont] || '"Work Sans", sans-serif'
-      
-      document.documentElement.style.setProperty('--font-arabic', arabicValue)
-      document.documentElement.style.setProperty('--font-latin', latinValue)
+      const arabicValue = ARABIC_FONT_MAP[settings.arabicFont] || '"Amiri", serif'
+      const latinValue = LATIN_FONT_MAP[settings.latinFont] || 'var(--font-geist), sans-serif'
+
+      document.documentElement.style.setProperty("--font-arabic", arabicValue)
+      document.documentElement.style.setProperty("--font-latin", latinValue)
     }
   }, [settings.arabicFont, settings.latinFont])
 

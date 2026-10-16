@@ -1,11 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { RotateCcw, Palette, Type, Globe, Check } from "lucide-react"
+import { RotateCcw, Palette, Type, Globe, Check, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useSettings } from "@/hooks/use-settings"
 import { useLanguage } from "@/hooks/use-language"
@@ -75,23 +75,41 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   ]
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleCancel}>
-      <DialogContent className="max-w-lg w-[95vw] rounded-3xl p-0 overflow-hidden border border-border/40 bg-background/95 backdrop-blur-xl shadow-2xl">
-        {/* Sticky Header */}
-        <div className="sticky top-0 z-10 px-8 py-6 pb-4 bg-background/80 backdrop-blur-xl border-b border-border/30">
-          <DialogHeader className="space-y-1.5 text-left">
-            <DialogTitle className="text-2xl font-bold tracking-tight text-foreground">
-              {t("settings.title")}
-            </DialogTitle>
-            <DialogDescription className="text-sm font-medium text-muted-foreground/80">
-              {t("settings.description")}
-            </DialogDescription>
-          </DialogHeader>
+    <Sheet open={isOpen} onOpenChange={handleCancel}>
+      <SheetContent
+        side="right"
+        showCloseButton={false}
+        className="w-[92vw] max-w-md rounded-l-3xl p-0 overflow-hidden border-border/40 glass-strong shadow-2xl sm:w-full sm:max-w-md lg:max-w-lg"
+      >
+        <div className="flex flex-1 min-h-0 flex-col">
+        {/* Header */}
+        <div className="flex-none glass border-b border-border/30 px-5 py-4 sm:px-8 sm:py-6">
+          <div className="flex items-start justify-between gap-3">
+            <SheetHeader className="space-y-1.5 text-left">
+              <SheetTitle className="text-2xl font-bold tracking-tight text-foreground">
+                {t("settings.title")}
+              </SheetTitle>
+              <SheetDescription className="text-sm font-medium text-muted-foreground/80">
+                {t("settings.description")}
+              </SheetDescription>
+            </SheetHeader>
+            <SheetClose asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 flex-none rounded-xl text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                aria-label={t("settings.cancel")}
+                title={t("settings.cancel")}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </SheetClose>
+          </div>
         </div>
 
         {/* Scrollable Content */}
-        <div className="px-8 py-6 space-y-10 max-h-[60vh] overflow-y-auto overflow-x-hidden">
-          <div className="space-y-8">
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-5 py-5 custom-scrollbar sm:px-8 sm:py-6">
+          <div className="space-y-8 sm:space-y-10">
 
             {/* Theme Selector */}
             <div className="space-y-4">
@@ -203,40 +221,42 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     className="py-4"
                   />
                 </div>
-              )}
-
-              {/* Show Translation Toggle */}
+              )}              {/* Reading Mode Selector */}
               <div className="space-y-4 px-1">
-                <div className="flex justify-between items-center bg-muted/40 p-4 rounded-2xl border border-border/30 hover:bg-muted/60 transition-colors">
-                  <Label className="text-sm font-semibold cursor-pointer" onClick={() => setTempSettings({ ...tempSettings, showTranslation: !tempSettings.showTranslation })}>
-                    Tampilkan Terjemahan
-                  </Label>
-                  <button 
-                    onClick={() => setTempSettings({ ...tempSettings, showTranslation: !tempSettings.showTranslation })}
-                    className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${tempSettings.showTranslation ? 'bg-primary' : 'bg-muted-foreground/30'}`}
-                  >
-                    <span 
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform ${tempSettings.showTranslation ? 'translate-x-6' : 'translate-x-1'}`}
-                    />
-                  </button>
+                <Label className="text-sm font-medium">Mode Baca</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { id: "both", label: "Arab + Terjemahan", arabic: true, translation: true },
+                    { id: "arabic", label: "Arab saja", arabic: true, translation: false },
+                    { id: "translation", label: "Terjemahan saja", arabic: false, translation: true },
+                  ].map((mode) => {
+                    const active =
+                      tempSettings.showArabicText === mode.arabic &&
+                      tempSettings.showTranslation === mode.translation
+                    return (
+                      <button
+                        key={mode.id}
+                        onClick={() =>
+                          setTempSettings({
+                            ...tempSettings,
+                            showArabicText: mode.arabic,
+                            showTranslation: mode.translation,
+                          })
+                        }
+                        className={`flex flex-col items-center gap-2 rounded-xl border-2 p-3 text-center transition-all duration-200 ${
+                          active ? "border-primary bg-primary/5 ring-2 ring-primary/10" : "border-transparent bg-muted/50 hover:bg-muted"
+                        }`}
+                      >
+                        <span className={`text-[11px] font-semibold leading-tight ${active ? "text-primary" : "text-muted-foreground"}`}>
+                          {mode.label}
+                        </span>
+                      </button>
+                    )
+                  })}
                 </div>
-              </div>
-
-              {/* Show Arabic Text Toggle */}
-              <div className="space-y-4 px-1">
-                <div className="flex justify-between items-center bg-muted/40 p-4 rounded-2xl border border-border/30 hover:bg-muted/60 transition-colors">
-                  <Label className="text-sm font-semibold cursor-pointer" onClick={() => setTempSettings({ ...tempSettings, showArabicText: !tempSettings.showArabicText })}>
-                    Tampilkan Teks Arab
-                  </Label>
-                  <button 
-                    onClick={() => setTempSettings({ ...tempSettings, showArabicText: !tempSettings.showArabicText })}
-                    className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${tempSettings.showArabicText ? 'bg-primary' : 'bg-muted-foreground/30'}`}
-                  >
-                    <span 
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform ${tempSettings.showArabicText ? 'translate-x-6' : 'translate-x-1'}`}
-                    />
-                  </button>
-                </div>
+                <p className="px-1 text-xs text-muted-foreground/70">
+                  Pilih mau menampilkan teks Arab, terjemahan, atau keduanya saat membaca.
+                </p>
               </div>
             </div>
 
@@ -260,7 +280,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
         </div>
 
         {/* Action Buttons */}
-        <div className="p-6 px-8 bg-background/50 backdrop-blur-md flex items-center gap-4 border-t border-border/30">
+        <div className="flex-none glass flex items-center gap-3 border-t border-border/30 p-4 px-5 sm:gap-4 sm:p-6 sm:px-8">
           <Button
             variant="outline"
             onClick={handleReset}
@@ -285,7 +305,8 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             </Button>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+        </div>
+      </SheetContent>
+    </Sheet>
   )
 }

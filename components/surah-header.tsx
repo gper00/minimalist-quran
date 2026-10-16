@@ -8,7 +8,7 @@ interface SurahHeaderProps {
 }
 
 export function SurahHeader({ surah }: SurahHeaderProps) {
-  const { language } = useLanguage()
+  const { language, t } = useLanguage()
 
   const getSurahName = () => {
     if (language === "en" && surah.name_translations?.en) {
@@ -18,22 +18,30 @@ export function SurahHeader({ surah }: SurahHeaderProps) {
   }
 
   return (
-    <div className="relative mb-6">
-      {/* Decorative glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+    <div className="mb-5 border-b border-border/30 pb-5 md:mb-8 md:pb-6">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2.5">
+            <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-primary/10 px-1.5 text-[11px] font-bold text-primary">
+              {surah.number_of_surah}
+            </span>
+            <h1 className="font-arabic text-2xl font-bold leading-tight text-foreground md:text-3xl">
+              {surah.name_translations?.ar}
+            </h1>
+          </div>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            <span className="font-semibold text-foreground/80">{surah.name}</span>
+            <span className="mx-1.5 text-muted-foreground/40">·</span>
+            <span className="font-serif italic text-muted-foreground/70">{getSurahName()}</span>
+          </p>
+        </div>
 
-      <div className="relative z-10 flex flex-col items-center gap-2 py-5 text-center md:gap-3 md:py-8">
-        <h1 className="font-arabic text-3xl font-bold leading-snug text-foreground md:text-5xl">
-          {surah.name_translations?.ar}
-        </h1>
-        <p className="flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground md:text-base">
-          <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary/10 px-1.5 text-[11px] font-bold text-primary md:h-6 md:min-w-6 md:px-2 md:text-xs">
-            {surah.number_of_surah}
+        <div className="flex shrink-0 flex-col items-end gap-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+          <span className="rounded-md bg-muted px-2 py-1">{surah.type}</span>
+          <span className="pr-0.5">
+            {surah.verses.length} {t("home.verses")}
           </span>
-          <span className="font-semibold text-foreground/80">{surah.name}</span>
-          <span aria-hidden className="text-muted-foreground/40">·</span>
-          <span className="font-serif italic text-muted-foreground/70">{getSurahName()}</span>
-        </p>
+        </div>
       </div>
     </div>
   )

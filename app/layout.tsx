@@ -9,6 +9,10 @@ import { AudioProvider } from "@/hooks/use-audio"
 import { Toaster } from "@/components/ui/toaster"
 
 import { GlobalAudioPlayer } from "@/components/global-audio-player"
+import { MobileNav } from "@/components/mobile-nav"
+import { getAllSurahs } from "@/lib/api"
+import { ARABIC_FONT_MAP, LATIN_FONT_MAP } from "@/lib/fonts"
+import { SITE_NAME, SITE_DESCRIPTION, SITE_URL } from "@/lib/site"
 
 const geist = Geist({
   subsets: ["latin"],
@@ -17,34 +21,51 @@ const geist = Geist({
 })
 
 export const viewport: Viewport = {
-  themeColor: "#0f172a",
+  themeColor: "#007f51",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  // No maximumScale: pinch-zoom must stay available (accessibility).
 }
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://quran.umamalfarizi.is-a.dev'),
+  metadataBase: new URL(SITE_URL),
+  applicationName: SITE_NAME,
   title: {
     default: "Al-Quran Digital - Bacaan yang Khusyuk",
     template: "%s | Al-Quran Digital",
   },
-  description: "Aplikasi Al-Quran digital minimalis untuk pengalaman membaca yang fokus dan khusyuk. Lengkap dengan terjemahan, tafsir, dan audio murottal.",
+  description: SITE_DESCRIPTION,
   keywords: ["Al-Quran", "Quran Digital", "Baca Quran Online", "Terjemahan Quran", "Tafsir", "Islamic App", "Murottal"],
   authors: [{ name: "Umam Alfarizi", url: "https://umamalfarizi.is-a.dev" }],
   creator: "Umam Alfarizi",
+  publisher: SITE_NAME,
+  category: "religion",
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
   openGraph: {
     type: "website",
     locale: "id_ID",
-    url: "https://quran.umamalfarizi.is-a.dev",
-    siteName: "Al-Quran Digital",
+    url: SITE_URL,
+    siteName: SITE_NAME,
     title: "Al-Quran Digital - Bacaan yang Khusyuk",
-    description: "Aplikasi Al-Quran digital minimalis untuk pengalaman membaca yang fokus dan khusyuk.",
-    images: [{ url: "/icon-512x512.png", width: 512, height: 512, alt: "Al-Quran Digital" }],
+    description: SITE_DESCRIPTION,
+    images: [{ url: "/icon-512x512.png", width: 512, height: 512, alt: SITE_NAME }],
   },
   twitter: {
-    card: "summary",
-    title: "Al-Quran Digital",
+    card: "summary_large_image",
+    title: SITE_NAME,
     description: "Bacaan Al-Quran yang khusyuk, jernih, dan penuh makna.",
     images: ["/icon-512x512.png"],
   },
@@ -52,34 +73,39 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Al-Quran Digital",
+    title: SITE_NAME,
   },
   formatDetection: {
     telephone: false,
   },
+  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION } }
+    : {}),
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const surahs = await getAllSurahs()
+
   return (
     <html lang="id" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Scheherazade+New:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Scheherazade+New:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&family=Lateef:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
         <style>{`
 html {
   font-family: ${geist.style.fontFamily};
-  --font-sans: var(--font-geist), sans-serif;
-  --font-body: var(--font-geist), sans-serif;
   --font-arabic: "Amiri";
   --font-latin: var(--font-geist), sans-serif;
+  --font-sans: var(--font-latin);
+  --font-body: var(--font-latin);
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
         `}</style>
@@ -87,27 +113,21 @@ html {
   (function() {
     try {
       var s = JSON.parse(localStorage.getItem('quran-settings') || '{}');
-      if (s.arabicFont) {
-        var arabicMap = {
-          'Amiri': '"Amiri"',
-          'Scheherazade New': '"Scheherazade New"',
-          'Noto Naskh Arabic': '"Noto Naskh Arabic"'
-        };
-        document.documentElement.style.setProperty('--font-arabic', arabicMap[s.arabicFont] || '"Amiri"');
+      var arabicMap = ${JSON.stringify(ARABIC_FONT_MAP)};
+      var latinMap = ${JSON.stringify(LATIN_FONT_MAP)};
+      if (s.arabicFont && arabicMap[s.arabicFont]) {
+        document.documentElement.style.setProperty('--font-arabic', arabicMap[s.arabicFont]);
       }
-      if (s.latinFont) {
-        var latinMap = {
-          'Geist': 'var(--font-geist), sans-serif',
-          'Work Sans': '"Work Sans", sans-serif',
-          'Open Sans': '"Open Sans", sans-serif'
-        };
-        document.documentElement.style.setProperty('--font-latin', latinMap[s.latinFont] || 'var(--font-geist), sans-serif');
+      if (s.latinFont && latinMap[s.latinFont]) {
+        document.documentElement.style.setProperty('--font-latin', latinMap[s.latinFont]);
       }
     } catch(e) {}
   })();
 ` }} />
       </head>
       <body className={`${geist.variable} antialiased`}>
+        <div className="app-backdrop" aria-hidden="true" />
+        <div className="relative z-10">
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
@@ -120,12 +140,14 @@ html {
               <AudioProvider>
                 {children}
 
+                <MobileNav surahs={surahs} />
                 <GlobalAudioPlayer />
                 <Toaster />
               </AudioProvider>
             </SettingsProvider>
           </LanguageProvider>
         </ThemeProvider>
+        </div>
       </body>
     </html>
   )

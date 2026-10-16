@@ -1,15 +1,14 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { getSurahDetail, getAllSurahs } from "@/lib/api"
-import { Header } from "@/components/header"
 import { SurahHeader } from "@/components/surah-header"
 import { BismillahIntro } from "@/components/bismillah-intro"
 import { VerseCard } from "@/components/verse-card"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { SurahSidebar } from "@/components/surah-sidebar"
-import { MobileSurahHeader } from "@/components/mobile-surah-header"
+import { SurahReaderShell } from "@/components/surah-reader-shell"
 import type { SurahDetail, Surah } from "@/lib/types"
 import { JsonLd } from "@/components/json-ld"
+import { SITE_NAME, SITE_URL } from "@/lib/site"
 
 interface SurahPageProps {
   params: Promise<{
@@ -43,40 +42,42 @@ export default async function SurahPage({ params }: SurahPageProps) {
     "name": `Surah ${surahDetail.name}`,
     "headline": `Surah ${surahDetail.name} (${surahDetail.name_translations?.id || ''})`,
     "description": `Baca Surah ${surahDetail.name} lengkap dengan terjemahan Indonesia, tafsir, dan audio.`,
+    "url": `${SITE_URL}/surah/${surahNumber}`,
     "position": surahNumber,
+    "inLanguage": "id-ID",
     "isPartOf": {
-      "@type": "CreativeWork",
-      "name": "Al-Quran Digital",
-      "url": "https://quran.umamalfarizi.is-a.dev"
+      "@type": "Book",
+      "name": SITE_NAME,
+      "url": SITE_URL
     }
+  }
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Beranda",
+        "item": SITE_URL,
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": `Surah ${surahDetail.name}`,
+        "item": `${SITE_URL}/surah/${surahNumber}`,
+      },
+    ],
   }
 
   return (
     <>
       <JsonLd data={jsonLd} />
-      <div className="h-screen bg-background transition-colors duration-300 overflow-hidden flex flex-col">
-        {/* Desktop Navbar - Full Width at Top */}
-        <div className="hidden md:block flex-none border-b border-border/20 sticky top-0 z-40 bg-muted/20 backdrop-blur-md">
-          <Header centeredBrand />
-        </div>
-
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-          {/* Sidebar - Desktop only */}
-          <aside className="hidden md:block w-72 lg:w-80 flex-shrink-0 h-full bg-muted/30 border-r border-border/10">
-            <SurahSidebar surahs={allSurahs} />
-          </aside>
-
-          {/* Reading Area */}
-          <div className="flex-1 flex flex-col h-full overflow-hidden">
-            {/* Mobile Navbar - sticky, hides on scroll */}
-            <div className="md:hidden flex-none sticky top-0 z-40">
-              <MobileSurahHeader surahName={surahDetail.name} surahs={allSurahs} />
-            </div>
-
-            {/* Main Content Area */}
-        <main className="flex-1 h-full overflow-y-auto scroll-smooth custom-scrollbar">
-          <div className="px-4 md:px-8 lg:px-12 py-4 md:py-6 pb-32 md:pb-16 max-w-5xl mx-auto">
+      <JsonLd data={breadcrumbLd} />
+      <div className="h-screen transition-colors duration-300 overflow-hidden flex flex-col">
+        <SurahReaderShell surahs={allSurahs}>
+          <div className="px-4 md:px-8 lg:px-12 pt-2 md:pt-4 pb-28 md:pb-16 max-w-5xl mx-auto">
             {/* Desktop Breadcrumb */}
             <div className="hidden md:flex items-center justify-between mb-6">
               <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -105,6 +106,8 @@ export default async function SurahPage({ params }: SurahPageProps) {
                   surahNameAr={surahDetail.name_translations?.ar}
                   tafsir={surahDetail.tafsir?.id?.kemenag?.text?.[verse.number.toString()]}
                   totalVerses={surahDetail.verses.length}
+                  surahVerses={surahDetail.verses}
+                  tafsirMap={surahDetail.tafsir?.id?.kemenag?.text}
                 />
               ))}
             </div>
@@ -144,9 +147,7 @@ export default async function SurahPage({ params }: SurahPageProps) {
               )}
             </div>
           </div>
-        </main>
-          </div>
-        </div>
+        </SurahReaderShell>
       </div>
     </>
   )
@@ -173,16 +174,32 @@ export async function generateMetadata({ params }: SurahPageProps) {
   return {
     title: `Surah ${surahDetail.name}`,
     description,
+    alternates: {
+      canonical: `/surah/${surahNumber}`,
+    },
     openGraph: {
       title: `Surah ${surahDetail.name} - Al-Quran Digital`,
       description,
       type: 'article',
-      url: `https://quran.umamalfarizi.is-a.dev/surah/${surahNumber}`,
+      url: `${SITE_URL}/surah/${surahNumber}`,
+      // Next replaces the whole openGraph object per page, so the shared image
+      // has to be repeated here or link previews end up with no image at all.
+      siteName: SITE_NAME,
+      locale: 'id_ID',
+      images: [
+        {
+          url: '/icon-512x512.png',
+          width: 512,
+          height: 512,
+          alt: `Surah ${surahDetail.name} - ${SITE_NAME}`,
+        },
+      ],
     },
     twitter: {
-      card: 'summary',
+      card: 'summary_large_image',
       title: `Surah ${surahDetail.name}`,
       description,
+      images: ['/icon-512x512.png'],
     },
   }
 }

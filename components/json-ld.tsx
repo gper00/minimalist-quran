@@ -1,22 +1,14 @@
-"use client"
-
-import { useEffect } from "react"
-
 interface JsonLdProps {
   data: object
 }
 
+// Rendered on the server so structured data is present in the initial HTML
+// response instead of being injected client-side after hydration.
 export function JsonLd({ data }: JsonLdProps) {
-  useEffect(() => {
-    const script = document.createElement("script")
-    script.type = "application/ld+json"
-    script.textContent = JSON.stringify(data)
-    document.head.appendChild(script)
-
-    return () => {
-      document.head.removeChild(script)
-    }
-  }, [data])
-
-  return null
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  )
 }
