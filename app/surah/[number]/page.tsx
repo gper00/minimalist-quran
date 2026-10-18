@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation"
-import Link from "next/link"
 import { getSurahDetail, getAllSurahs } from "@/lib/api"
 import { SurahHeader } from "@/components/surah-header"
 import { BismillahIntro } from "@/components/bismillah-intro"
 import { VerseCard } from "@/components/verse-card"
-import { ChevronLeft, ChevronRight } from "lucide-react"
 import { SurahReaderShell } from "@/components/surah-reader-shell"
+import { ReaderBreadcrumb } from "@/components/reader-breadcrumb"
+import { SurahPagination } from "@/components/surah-pagination"
 import type { SurahDetail, Surah } from "@/lib/types"
 import { JsonLd } from "@/components/json-ld"
 import { SITE_NAME, SITE_URL } from "@/lib/site"
@@ -79,18 +79,17 @@ export default async function SurahPage({ params }: SurahPageProps) {
         <SurahReaderShell surahs={allSurahs}>
           <div className="px-4 md:px-8 lg:px-12 pt-2 md:pt-4 pb-28 md:pb-16 max-w-5xl mx-auto">
             {/* Desktop Breadcrumb */}
-            <div className="hidden md:flex items-center justify-between mb-6">
-              <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                <Link href="/" className="hover:text-primary transition-colors flex items-center gap-1 group">
-                  <ChevronLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
-                  Beranda
-                </Link>
-                <span className="opacity-40">/</span>
-                <span className="text-foreground">{surahDetail.name}</span>
-              </div>
-            </div>
+            <ReaderBreadcrumb surahName={surahDetail.name} />
 
-            <SurahHeader surah={surahDetail} />
+            <SurahHeader
+              surah={{
+                number_of_surah: surahDetail.number_of_surah,
+                name: surahDetail.name,
+                name_translations: surahDetail.name_translations,
+                type: surahDetail.type,
+                verseCount: surahDetail.verses.length,
+              }}
+            />
 
             {surahNumber !== 1 && surahNumber !== 9 && (
               <BismillahIntro surahNumber={surahNumber} surahName={surahDetail.name} />
@@ -104,48 +103,14 @@ export default async function SurahPage({ params }: SurahPageProps) {
                   surahNumber={surahNumber}
                   surahName={surahDetail.name}
                   surahNameAr={surahDetail.name_translations?.ar}
-                  tafsir={surahDetail.tafsir?.id?.kemenag?.text?.[verse.number.toString()]}
                   totalVerses={surahDetail.verses.length}
                   surahVerses={surahDetail.verses}
-                  tafsirMap={surahDetail.tafsir?.id?.kemenag?.text}
                 />
               ))}
             </div>
 
             {/* Pagination */}
-            <div className="mt-12 flex items-center justify-between gap-4 border-t border-border/10 pt-8">
-              {previousSurah ? (
-                <Link href={`/surah/${previousSurah}`} className="flex-1 group">
-                  <div className="p-3 rounded-xl border border-border/50 hover:bg-muted/50 transition-all group-active:scale-[0.98]">
-                    <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5">
-                      <ChevronLeft className="h-3 w-3" />
-                      Sebelumnya
-                    </div>
-                    <div className="text-sm font-bold truncate group-hover:text-primary transition-colors">
-                      Surah {previousSurah}
-                    </div>
-                  </div>
-                </Link>
-              ) : (
-                <div className="flex-1" />
-              )}
-
-              {nextSurah ? (
-                <Link href={`/surah/${nextSurah}`} className="flex-1 group text-right">
-                  <div className="p-3 rounded-xl border border-border/50 hover:bg-muted/50 transition-all group-active:scale-[0.98]">
-                    <div className="flex items-center justify-end gap-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5">
-                      Selanjutnya
-                      <ChevronRight className="h-3 w-3" />
-                    </div>
-                    <div className="text-sm font-bold truncate group-hover:text-primary transition-colors">
-                      Surah {nextSurah}
-                    </div>
-                  </div>
-                </Link>
-              ) : (
-                <div className="flex-1" />
-              )}
-            </div>
+            <SurahPagination previousSurah={previousSurah} nextSurah={nextSurah} />
           </div>
         </SurahReaderShell>
       </div>

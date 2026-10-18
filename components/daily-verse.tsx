@@ -103,6 +103,7 @@ export function DailyVerse() {
 
           <Link
             href={`/surah/${randomVerse.surahNumber}#verse-${randomVerse.verse}`}
+            prefetch={false}
             className="group/link mt-4 inline-flex w-fit items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary/80 transition-colors hover:bg-primary/10 hover:text-primary"
           >
             {language === "id" ? "Baca ayat lengkap" : "Read full verse"}

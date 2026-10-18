@@ -23,13 +23,13 @@ export function SurahCard({ surah, mode = "grid" }: SurahCardProps) {
 
   if (mode === "list") {
     return (
-      <Link href={`/surah/${surah.number_of_surah}`} className="group block">
+      <Link href={`/surah/${surah.number_of_surah}`} prefetch={false} className="group block">
         <div className="flex items-center justify-between p-4 rounded-xl border border-border/50 hover:bg-primary/5 hover:border-primary/20 transition-all duration-300">
           <div className="flex items-center gap-4">
             <span className="text-sm font-bold text-muted-foreground w-6">{surah.number_of_surah}</span>
             <div className="flex flex-col">
               <span className="font-bold text-foreground group-hover:text-primary transition-colors">{surah.name}</span>
-              <span className="text-xs text-muted-foreground font-medium">{getSurahName()} • {surah.number_of_ayah} Ayat</span>
+              <span className="text-xs text-muted-foreground font-medium">{getSurahName()} • {surah.number_of_ayah} {t("home.verses")}</span>
             </div>
           </div>
           <span className="font-arabic text-xl text-foreground/80 group-hover:text-primary transition-colors">{surah.name_translations.ar}</span>
@@ -65,7 +65,7 @@ export function SurahCard({ surah, mode = "grid" }: SurahCardProps) {
 
           <div className="pt-4 border-t border-border/10 flex items-center justify-between text-xs font-bold text-muted-foreground/60 uppercase tracking-widest">
             <span>{surah.number_of_ayah} {t("home.verses")}</span>
-            <span className="bg-muted px-2 py-1 rounded-md">{surah.type}</span>
+            <span className="bg-muted px-2 py-1 rounded-md">{surah.type === "Makkiyah" ? t("home.makkiyah") : t("home.madaniyah")}</span>
           </div>
         </div>
       </div>

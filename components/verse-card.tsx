@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import dynamic from "next/dynamic"
 import { BookOpen, Bookmark, BookmarkCheck, PlayCircle, PauseCircle, Loader2, Share2, Check, ImageDown, MoreVertical, History } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -10,31 +11,43 @@ import { saveLastRead, getLastRead, saveSavedVerse, isVerseSaved, removeSavedVer
 import { useSettings } from "@/hooks/use-settings"
 import { useLanguage } from "@/hooks/use-language"
 import { useAudio } from "@/hooks/use-audio"
-import { TafsirModal } from "./tafsir-modal"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { cn, cleanVerseText } from "@/lib/utils"
+import { loadTafsir } from "@/lib/tafsir"
 import { formatVerseForShare, shareToWhatsApp, shareToTwitter, shareToFacebook, copyToClipboard } from "@/lib/share"
-import { ARABIC_FONTS, LATIN_FONTS } from "@/lib/fonts"
-import { ShareDialog } from "@/components/share"
 import type { AyahShareData } from "@/types/share"
+
+// A long surah mounts 200+ verse cards. These dialogs (and the image-export
+// library behind the share dialog) are only needed if the reader actually opens
+// one, so they are code-split out of the initial bundle and mounted on demand.
+const TafsirModal = dynamic(() => import("./tafsir-modal").then((m) => m.TafsirModal), { ssr: false })
+const ShareDialog = dynamic(() => import("@/components/share").then((m) => m.ShareDialog), { ssr: false })
+
+const warmTafsir = () => {
+  void import("./tafsir-modal")
+}
+
+const warmShareDialog = () => {
+  void import("@/components/share")
+}
 
 interface VerseCardProps {
   verse: Verse
   surahNumber: number
   surahName: string
   surahNameAr?: string
-  tafsir?: string
   totalVerses?: number
   surahVerses?: Verse[]
-  tafsirMap?: Record<string, string>
 }
 
-export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, totalVerses = 0, surahVerses, tafsirMap }: VerseCardProps) {
+export function VerseCard({ verse, surahNumber, surahName, surahNameAr, totalVerses = 0, surahVerses }: VerseCardProps) {
   const [showTafsirModal, setShowTafsirModal] = useState(false)
+  const [tafsirMounted, setTafsirMounted] = useState(false)
   const [tafsirVerse, setTafsirVerse] = useState(verse.number)
   const [isLastRead, setIsLastRead] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
   const [shareOpen, setShareOpen] = useState(false)
+  const [shareMounted, setShareMounted] = useState(false)
   
   const { settings } = useSettings()
   const { language, t } = useLanguage()
@@ -120,7 +133,10 @@ export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, 
         verseNumber: verse.number,
         surahName,
         verseText: verse.text,
+        // Store both languages so the saved list follows a later language switch.
         translation,
+        translation_id: verse.translation_id,
+        translation_en: verse.translation_en,
         timestamp: Date.now(),
       }
 
@@ -135,8 +151,16 @@ export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, 
   }
 
   const openTafsirModal = () => {
+    setTafsirMounted(true)
     setTafsirVerse(verse.number)
     setShowTafsirModal(true)
+  }
+
+  // Mounting on first open keeps Radix exit transitions working on every open
+  // after the first, without paying for 200+ dialogs on page load.
+  const openShareDialog = () => {
+    setShareMounted(true)
+    setShareOpen(true)
   }
 
   const closeTafsirModal = () => {
@@ -154,7 +178,6 @@ export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, 
   const tafsirIndex = verseNumbers.indexOf(tafsirVerse)
   const canNavigateTafsir = verseNumbers.length > 0 && tafsirIndex !== -1
   const activeVerse = surahVerses?.find((v) => v.number === tafsirVerse)
-  const activeTafsirText = tafsirMap?.[tafsirVerse.toString()]
   const activeVerseText = activeVerse
     ? cleanVerseText(activeVerse.text, activeVerse.number, surahNumber)
     : getVerseText()
@@ -184,8 +207,8 @@ export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, 
       case "copy":
         copyToClipboard(shareText).then((success) => {
           toast({
-            title: success ? "Berhasil Disalin" : "Gagal Menyalin",
-            description: success ? "Ayat telah disalin ke clipboard" : "Terjadi kesalahan, coba lagi",
+            title: success ? t("verse.copy_success") : t("verse.copy_failed"),
+            description: success ? t("verse.copy_success_description") : t("verse.copy_failed_description"),
             duration: 2000,
           })
         })
@@ -215,7 +238,7 @@ export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, 
                 size="icon"
                 onClick={toggleAudio}
                 className={`h-10 w-10 rounded-full transition-colors ${isPlaying || isLoadingAudio ? "text-primary bg-primary/10 hover:bg-primary/20" : "hover:text-primary hover:bg-primary/5"}`}
-                title={isPlaying ? "Hentikan Murottal" : "Putar Murottal"}
+                title={isPlaying ? t("verse.stop_audio") : t("verse.play_audio")}
               >
                 {isLoadingAudio ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -228,17 +251,26 @@ export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, 
 
               {/* Secondary Actions - Desktop */}
               <div className="hidden md:flex items-center gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
-                {tafsir && (
-                  <Button variant="ghost" size="icon" onClick={openTafsirModal} className="rounded-full hover:text-primary" title={t("verse.tafsir")}>
-                    <BookOpen className="w-4 h-4" />
-                  </Button>
-                )}
-                <Button variant="ghost" size="icon" onClick={() => setShareOpen(true)} className="rounded-full hover:text-primary" title="Export Gambar">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={openTafsirModal}
+                  onPointerEnter={() => {
+                    warmTafsir()
+                    // Warm the dialogue content too: hovering usually means a click is next.
+                    void loadTafsir(surahNumber).catch(() => {})
+                  }}
+                  className="rounded-full hover:text-primary"
+                  title={t("verse.tafsir")}
+                >
+                  <BookOpen className="w-4 h-4" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={openShareDialog} onPointerEnter={warmShareDialog} className="rounded-full hover:text-primary" title={t("verse.export")}>
                   <ImageDown className="w-4 h-4" />
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="rounded-full hover:text-primary" title="Share">
+                    <Button variant="ghost" size="icon" className="rounded-full hover:text-primary" title={t("verse.share")}>
                       <Share2 className="w-4 h-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -246,7 +278,7 @@ export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, 
                     <DropdownMenuItem onClick={() => handleShare("whatsapp")} className="cursor-pointer">WhatsApp</DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleShare("twitter")} className="cursor-pointer">Twitter / X</DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleShare("facebook")} className="cursor-pointer">Facebook</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleShare("copy")} className="cursor-pointer">Salin Teks</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleShare("copy")} className="cursor-pointer">{t("verse.copy_text")}</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <Button variant="ghost" size="icon" onClick={handleSaveVerse} className={`rounded-full ${isSaved ? "text-primary" : "hover:text-primary"}`} title={isSaved ? t("verse.unsave") : t("verse.save")}>
@@ -261,21 +293,19 @@ export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, 
               <div className="md:hidden flex items-center opacity-80 group-hover:opacity-100">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="rounded-full h-8 w-8">
+                    <Button variant="ghost" size="icon" onPointerEnter={warmShareDialog} className="rounded-full h-8 w-8">
                       <MoreVertical className="w-4 h-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48 rounded-xl">
-                    {tafsir && (
-                      <DropdownMenuItem onClick={openTafsirModal} className="cursor-pointer gap-2 py-3">
-                        <BookOpen className="w-4 h-4" /> Tafsir Kemenag
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem onClick={() => setShareOpen(true)} className="cursor-pointer gap-2 py-3">
-                      <ImageDown className="w-4 h-4" /> Export Gambar
+                    <DropdownMenuItem onClick={openTafsirModal} className="cursor-pointer gap-2 py-3">
+                      <BookOpen className="w-4 h-4" /> Tafsir Kemenag
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={openShareDialog} className="cursor-pointer gap-2 py-3">
+                      <ImageDown className="w-4 h-4" /> {t("verse.export")}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleShare("copy")} className="cursor-pointer gap-2 py-3">
-                      <Share2 className="w-4 h-4" /> Bagikan Teks
+                      <Share2 className="w-4 h-4" /> {t("verse.share")}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleSaveVerse} className={`cursor-pointer gap-2 py-3 ${isSaved ? "text-primary" : ""}`}>
                       {isSaved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />} 
@@ -325,14 +355,14 @@ export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, 
         <hr className="mt-8 border-border/20" />
       </div>
 
-      {tafsir && (
+      {tafsirMounted && (
         <TafsirModal
           isOpen={showTafsirModal}
           onClose={closeTafsirModal}
+          surahNumber={surahNumber}
           verseNumber={tafsirVerse}
           surahName={surahName}
           verseText={activeVerseText}
-          tafsir={activeTafsirText ?? ""}
           hasPrev={canNavigateTafsir && tafsirIndex > 0}
           hasNext={canNavigateTafsir && tafsirIndex < verseNumbers.length - 1}
           onPrev={canNavigateTafsir ? () => setTafsirVerse(verseNumbers[tafsirIndex - 1]) : undefined}
@@ -340,11 +370,13 @@ export function VerseCard({ verse, surahNumber, surahName, surahNameAr, tafsir, 
         />
       )}
 
-      <ShareDialog
-        open={shareOpen}
-        onOpenChange={setShareOpen}
-        data={shareData}
-      />
+      {shareMounted && (
+        <ShareDialog
+          open={shareOpen}
+          onOpenChange={setShareOpen}
+          data={shareData}
+        />
+      )}
     </>
   )
 }

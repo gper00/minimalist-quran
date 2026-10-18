@@ -6,6 +6,7 @@ import { useParams } from "next/navigation"
 import { Search, X, LayoutGrid } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { useLanguage } from "@/hooks/use-language"
 import type { Surah } from "@/lib/types"
 
 interface SurahSidebarProps {
@@ -15,7 +16,11 @@ interface SurahSidebarProps {
 export function SurahSidebar({ surahs }: SurahSidebarProps) {
   const params = useParams()
   const currentSurahNumber = Number(params.number)
+  const { language, t } = useLanguage()
   const [searchQuery, setSearchQuery] = useState("")
+
+  const getSurahMeaning = (surah: Surah) =>
+    language === "en" ? surah.name_translations.en : surah.name_translations.id
 
   const filteredSurahs = useMemo(() => {
     const query = searchQuery.toLowerCase().trim()
@@ -23,7 +28,8 @@ export function SurahSidebar({ surahs }: SurahSidebarProps) {
     return surahs.filter(s => 
       s.name.toLowerCase().includes(query) || 
       s.number_of_surah.toString() === query ||
-      s.name_translations.id.toLowerCase().includes(query)
+      s.name_translations.id.toLowerCase().includes(query) ||
+      s.name_translations.en.toLowerCase().includes(query)
     )
   }, [surahs, searchQuery])
 
@@ -46,7 +52,7 @@ export function SurahSidebar({ surahs }: SurahSidebarProps) {
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/50 transition-colors group-focus-within:text-primary" />
           <Input
             type="text"
-            placeholder="Cari surah..."
+            placeholder={t("search.placeholder")}
             className="pl-9 bg-muted/50 border border-border/50 focus-visible:ring-primary/20"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -64,6 +70,7 @@ export function SurahSidebar({ surahs }: SurahSidebarProps) {
                 key={surah.number_of_surah}
                 id={`sidebar-surah-${surah.number_of_surah}`}
                 href={`/surah/${surah.number_of_surah}`}
+                prefetch={false}
                 className={`
                   flex items-center justify-between py-2.5 px-3 rounded-lg transition-all duration-200 group no-underline
                   ${isActive 
@@ -81,7 +88,7 @@ export function SurahSidebar({ surahs }: SurahSidebarProps) {
                   <div className="flex flex-col">
                     <span className="text-sm font-bold leading-tight">{surah.name}</span>
                     <span className={`text-[9px] font-medium uppercase tracking-wider ${isActive ? "text-primary/70" : "text-muted-foreground"}`}>
-                      {surah.name_translations.id}
+                      {getSurahMeaning(surah)}
                     </span>
                   </div>
                 </div>

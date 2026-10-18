@@ -1,10 +1,21 @@
 "use client"
 
 import { useLanguage } from "@/hooks/use-language"
-import type { SurahDetail } from "@/lib/types"
 
+// Only the fields this header renders cross the server/client boundary. Passing
+// the whole SurahDetail used to drag the entire tafsir into the page payload.
 interface SurahHeaderProps {
-  surah: SurahDetail
+  surah: {
+    number_of_surah: number
+    name: string
+    name_translations: {
+      ar: string
+      id: string
+      en?: string
+    }
+    type: string
+    verseCount: number
+  }
 }
 
 export function SurahHeader({ surah }: SurahHeaderProps) {
@@ -37,9 +48,9 @@ export function SurahHeader({ surah }: SurahHeaderProps) {
         </div>
 
         <div className="flex shrink-0 flex-col items-end gap-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
-          <span className="rounded-md bg-muted px-2 py-1">{surah.type}</span>
+          <span className="rounded-md bg-muted px-2 py-1">{surah.type === "Makkiyah" ? t("home.makkiyah") : t("home.madaniyah")}</span>
           <span className="pr-0.5">
-            {surah.verses.length} {t("home.verses")}
+            {surah.verseCount} {t("home.verses")}
           </span>
         </div>
       </div>

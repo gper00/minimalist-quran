@@ -2,7 +2,7 @@
 // Set NEXT_PUBLIC_SITE_URL in the deployment environment (e.g. Vercel) so
 // metadata, sitemap and robots all point at the production domain.
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://quran.umamalfarizi.is-a.dev"
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://mysimplequran.vercel.app"
 
 export const SITE_NAME = "Al-Quran Digital"
 

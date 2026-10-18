@@ -38,6 +38,12 @@ export function SavedVersesModal({ isOpen, onClose }: SavedVersesModalProps) {
     })
   }
 
+  // Entries saved before both translations were stored only have `translation`.
+  const getTranslation = (verse: SavedVerse) =>
+    language === "en"
+      ? verse.translation_en ?? verse.translation
+      : verse.translation_id ?? verse.translation
+
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString(language === "en" ? "en-US" : "id-ID", {
       year: "numeric",
@@ -116,7 +122,8 @@ export function SavedVersesModal({ isOpen, onClose }: SavedVersesModalProps) {
                         size="icon"
                         onClick={() => handleRemoveVerse(verse.id)}
                         className="h-9 w-9 flex-none rounded-xl text-rose-500/70 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
-                        title="Hapus ayat"
+                        title={t("saved_verses.remove")}
+                        aria-label={t("saved_verses.remove")}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -127,7 +134,7 @@ export function SavedVersesModal({ isOpen, onClose }: SavedVersesModalProps) {
                         <p className="font-arabic text-2xl leading-loose text-foreground">{cleanVerseText(verse.verseText, verse.verseNumber, verse.surahNumber)}</p>
                       </div>
                       <div className="text-left bg-background/50 p-4 rounded-xl">
-                        <p className="text-sm leading-relaxed font-medium text-muted-foreground">{verse.translation}</p>
+                        <p className="text-sm leading-relaxed font-medium text-muted-foreground">{getTranslation(verse)}</p>
                       </div>
                     </div>
                   </CardContent>

@@ -251,6 +251,11 @@
 
   .verse-card {
     @apply border-b border-border/50 py-8 px-4 transition-all duration-300 hover:bg-muted/30;
+    /* Long surahs paint 200+ cards at once: let the browser skip style/layout/paint
+       for the offscreen ones. "auto <length>" remembers the last measured height
+       so the scrollbar stays stable until a card has been rendered once. */
+    content-visibility: auto;
+    contain-intrinsic-size: auto 420px;
   }
 
   .verse-number-wrapper {

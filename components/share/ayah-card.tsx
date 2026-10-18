@@ -4,6 +4,7 @@ import React, { forwardRef } from "react";
 import { AyahShareData, CardOptions } from "@/types/share";
 import { CARD_THEMES, RATIO_DIMENSIONS } from "@/lib/card-themes";
 import { AMIRI_BASE64_CSS } from "@/lib/fonts-base64";
+import { useLanguage } from "@/hooks/use-language";
 
 interface AyahCardProps {
   data: AyahShareData;
@@ -12,6 +13,7 @@ interface AyahCardProps {
 
 export const AyahCard = forwardRef<HTMLDivElement, AyahCardProps>(
   ({ data, options }, ref) => {
+    const { t } = useLanguage();
     const theme = CARD_THEMES[options.theme];
     const dim = RATIO_DIMENSIONS[options.ratio];
 
@@ -164,7 +166,7 @@ export const AyahCard = forwardRef<HTMLDivElement, AyahCardProps>(
             margin: "32px 0 0",
             fontWeight: 500,
           }}>
-            {data.surahName} • Ayat {data.ayahNumber}
+            {data.surahName} • {t("audio.verse")} {data.ayahNumber}
           </p>
         </div>
 

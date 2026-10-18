@@ -59,7 +59,10 @@ export interface SavedVerse {
   verseNumber: number
   surahName: string
   verseText: string
+  /** Kept for entries saved before both translations were stored. */
   translation: string
+  translation_id?: string
+  translation_en?: string
   timestamp: number
   note?: string
 }

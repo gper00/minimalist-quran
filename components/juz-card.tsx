@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useLanguage } from "@/hooks/use-language"
 import type { JuzInfo } from "@/lib/juz"
 
 interface JuzCardProps {
@@ -9,18 +10,19 @@ interface JuzCardProps {
 }
 
 export function JuzCard({ juz, mode = "grid" }: JuzCardProps) {
+  const { t } = useLanguage()
   const url = `/surah/${juz.start.surah}#verse-${juz.start.verse}`
 
   if (mode === "list") {
     return (
-      <Link href={url} className="group block">
+      <Link href={url} prefetch={false} className="group block">
         <div className="flex items-center justify-between p-4 rounded-xl border border-border/50 hover:bg-primary/5 hover:border-primary/20 transition-all duration-300">
           <div className="flex items-center gap-4">
             <span className="text-sm font-bold text-muted-foreground w-6">{juz.number}</span>
             <div className="flex flex-col">
               <span className="font-bold text-foreground group-hover:text-primary transition-colors">Juz {juz.number}</span>
               <span className="text-xs text-muted-foreground font-medium">
-                Mulai: {juz.start.surahName} Ayat {juz.start.verse}
+                {t("juz.start")}: {juz.start.surahName} {t("audio.verse")} {juz.start.verse}
               </span>
             </div>
           </div>
@@ -46,7 +48,7 @@ export function JuzCard({ juz, mode = "grid" }: JuzCardProps) {
 
         <div className="relative z-10 pt-4 border-t border-border/10">
           <p className="text-sm text-muted-foreground font-medium flex justify-between">
-            <span>Mulai</span>
+            <span>{t("juz.start")}</span>
             <span className="text-foreground">{juz.start.surahName} : {juz.start.verse}</span>
           </p>
         </div>

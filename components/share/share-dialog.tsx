@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/hooks/use-language";
 import { AyahCard } from "./ayah-card";
 import { CARD_THEMES, RATIO_DIMENSIONS } from "@/lib/card-themes";
 import type { AyahShareData, CardOptions, CardTheme, CardRatio } from "@/types/share";
@@ -29,6 +30,7 @@ const RATIOS: CardRatio[] = ["1:1", "9:16", "16:9"];
 export function ShareDialog({ open, onOpenChange, data }: ShareDialogProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [isExporting, setIsExporting] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -75,13 +77,13 @@ export function ShareDialog({ open, onOpenChange, data }: ShareDialogProps) {
       link.click();
 
       toast({
-        title: "Berhasil!",
-        description: "Gambar berhasil diunduh.",
+        title: t("shared.export_success"),
+        description: t("shared.export_success_description"),
       });
     } catch {
       toast({
-        title: "Gagal",
-        description: "Gagal mengekspor gambar. Coba lagi.",
+        title: t("shared.export_failed"),
+        description: t("shared.export_failed_description"),
       });
     } finally {
       setIsExporting(false);
@@ -89,12 +91,12 @@ export function ShareDialog({ open, onOpenChange, data }: ShareDialogProps) {
   }, [options, data, toast]);
 
   const handleCopyLink = useCallback(() => {
-    const url = `${window.location.origin}/surah/${data.surahNumber}#ayat-${data.ayahNumber}`;
+    const url = `${window.location.origin}/surah/${data.surahNumber}#verse-${data.ayahNumber}`;
     navigator.clipboard.writeText(url);
     setCopied(true);
     toast({
-      title: "Tersalin!",
-      description: "Link ayat disalin ke clipboard.",
+      title: t("shared.copied"),
+      description: t("shared.copied_description"),
     });
     setTimeout(() => setCopied(false), 2000);
   }, [data, toast]);
@@ -104,9 +106,9 @@ export function ShareDialog({ open, onOpenChange, data }: ShareDialogProps) {
       <DialogContent className="w-[95vw] sm:max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-base font-medium">
-            Bagikan Ayat
+            {t("shared.title")}
           </DialogTitle>
-          <DialogDescription className="sr-only">Bagikan ayat ini dalam bentuk gambar</DialogDescription>
+          <DialogDescription className="sr-only">{t("shared.description")}</DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-5 mt-2">
@@ -122,10 +124,10 @@ export function ShareDialog({ open, onOpenChange, data }: ShareDialogProps) {
 
           {/* Theme Picker */}
           <div>
-            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide font-medium">Tema</p>
+            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide font-medium">{t("shared.theme")}</p>
             <div className="flex gap-2 flex-wrap">
               {(Object.keys(CARD_THEMES) as CardTheme[]).map((themeId) => {
-                const t = CARD_THEMES[themeId];
+                const cardTheme = CARD_THEMES[themeId];
                 return (
                   <button
                     key={themeId}
@@ -137,11 +139,11 @@ export function ShareDialog({ open, onOpenChange, data }: ShareDialogProps) {
                     }`}
                   >
                     <div
-                      style={{ background: t.bg, border: `1px solid ${t.border}` }}
+                      style={{ background: cardTheme.bg, border: `1px solid ${cardTheme.border}` }}
                       className="w-8 h-8 rounded-md"
                     />
                     <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                      {t.label.split(" ")[0]}
+                      {cardTheme.label.split(" ")[0]}
                     </span>
                   </button>
                 );
@@ -151,7 +153,7 @@ export function ShareDialog({ open, onOpenChange, data }: ShareDialogProps) {
 
           {/* Ratio Picker */}
           <div>
-            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide font-medium">Ukuran</p>
+            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide font-medium">{t("shared.size")}</p>
             <div className="flex gap-2">
               {RATIOS.map((r) => (
                 <button
@@ -179,10 +181,10 @@ export function ShareDialog({ open, onOpenChange, data }: ShareDialogProps) {
 
           {/* Toggles */}
           <div className="flex flex-col gap-3">
-            <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Konten</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">{t("shared.content")}</p>
             <div className="flex items-center justify-between">
               <Label htmlFor="show-translation" className="text-sm cursor-pointer">
-                Tampilkan Terjemahan
+                {t("shared.show_translation")}
               </Label>
               <Switch
                 id="show-translation"
@@ -193,10 +195,10 @@ export function ShareDialog({ open, onOpenChange, data }: ShareDialogProps) {
             <div className="flex items-center justify-between">
               <div>
                 <Label htmlFor="show-transliteration" className="text-sm cursor-pointer">
-                  Tampilkan Transliterasi
+                  {t("shared.show_transliteration")}
                 </Label>
                 {!data.transliteration && (
-                  <p className="text-[10px] text-muted-foreground">Tidak tersedia untuk ayat ini</p>
+                  <p className="text-[10px] text-muted-foreground">{t("shared.transliteration_unavailable")}</p>
                 )}
               </div>
               <Switch
@@ -216,7 +218,7 @@ export function ShareDialog({ open, onOpenChange, data }: ShareDialogProps) {
               className="flex-1"
             >
               <Download className="w-4 h-4 mr-2" />
-              {isExporting ? "Mengekspor..." : "Unduh Gambar"}
+              {isExporting ? t("shared.exporting") : t("shared.download")}
             </Button>
             <Button
               variant="outline"
@@ -228,7 +230,7 @@ export function ShareDialog({ open, onOpenChange, data }: ShareDialogProps) {
               ) : (
                 <Link2 className="w-4 h-4 mr-2" />
               )}
-              {copied ? "Tersalin!" : "Salin Link"}
+              {copied ? t("shared.copied") : t("shared.copy_link")}
             </Button>
           </div>
 

@@ -85,7 +85,7 @@ export function ContinueReading() {
             <div className="flex items-center gap-2 w-full sm:w-auto flex-shrink-0">
               <Button asChild className="flex-1 sm:flex-none text-[13px] sm:text-xs font-semibold shadow-sm shadow-brand/10 rounded-xl sm:rounded-lg px-4 h-10 sm:h-9">
                 <Link href={`/surah/${lastRead.surahNumber}#verse-${lastRead.verseNumber}`} className="flex items-center justify-center gap-1.5">
-                  {language === "id" ? "Lanjutkan Membaca" : "Continue Reading"}
+                  {t("home.continue_reading")}
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </Button>
@@ -94,7 +94,8 @@ export function ContinueReading() {
                 size="icon"
                 onClick={handleHide}
                 className="h-10 w-10 sm:h-9 sm:w-9 flex-shrink-0 text-muted-foreground/50 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl sm:rounded-lg transition-colors"
-                title="Sembunyikan sementara"
+                title={t("home.hide_temporarily")}
+                aria-label={t("home.hide_temporarily")}
               >
                 <X className="w-3.5 h-3.5" />
               </Button>

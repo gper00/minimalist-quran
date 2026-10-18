@@ -4,6 +4,7 @@ import { useEffect, useState, type RefObject } from "react"
 import { ArrowUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useAudio } from "@/hooks/use-audio"
+import { useLanguage } from "@/hooks/use-language"
 import { cn } from "@/lib/utils"
 
 interface BackToTopProps {
@@ -17,6 +18,7 @@ export function BackToTop({ targetRef, threshold = 600 }: BackToTopProps) {
   const [visible, setVisible] = useState(false)
   // The mini player floats over the bottom edge too — lift the button above it.
   const { status } = useAudio()
+  const { t } = useLanguage()
   const playerVisible = status !== "idle"
 
   useEffect(() => {
@@ -47,8 +49,8 @@ export function BackToTop({ targetRef, threshold = 600 }: BackToTopProps) {
       variant="ghost"
       size="icon"
       onClick={scrollToTop}
-      aria-label="Kembali ke atas"
-      title="Kembali ke atas"
+      aria-label={t("common.back_to_top")}
+      title={t("common.back_to_top")}
       tabIndex={visible ? 0 : -1}
       className={cn(
         // Sits above the mobile bottom nav (and the mini player), lower-right corner of the reader.

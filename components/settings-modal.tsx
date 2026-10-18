@@ -69,9 +69,9 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   }
 
   const themes = [
-    { id: "light", name: "Light", color: "bg-white border-gray-200" },
-    { id: "sepia", name: "Sepia", color: "bg-[#f4ecd8] border-[#e2d6b5]" },
-    { id: "dark", name: "Dark", color: "bg-[#1a1a1a] border-gray-800" },
+    { id: "light", name: t("settings.light"), color: "bg-white border-gray-200" },
+    { id: "sepia", name: t("settings.sepia"), color: "bg-[#f4ecd8] border-[#e2d6b5]" },
+    { id: "dark", name: t("settings.dark"), color: "bg-[#1a1a1a] border-gray-800" },
   ]
 
   return (
@@ -115,7 +115,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             <div className="space-y-4">
               <Label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
                 <Palette className="w-4 h-4" />
-                Tema Warna
+                {t("settings.theme_section")}
               </Label>
               <div className="grid grid-cols-3 gap-3">
                 {themes.map((themeOption) => (
@@ -147,7 +147,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
               {/* Arabic Font Family Picker */}
               <div className="space-y-4 px-1">
-                <Label className="text-sm font-medium">Jenis Font Arab</Label>
+                <Label className="text-sm font-medium">{t("settings.arabic_font")}</Label>
                 <div className="grid grid-cols-3 gap-2">
                   {ARABIC_FONTS.map((font) => (
                     <button
@@ -169,7 +169,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
               {/* Latin Font Family Picker */}
               <div className="space-y-4 px-1">
-                <Label className="text-sm font-medium">Jenis Font Latin</Label>
+                <Label className="text-sm font-medium">{t("settings.latin_font")}</Label>
                 <div className="grid grid-cols-2 gap-2">
                   {LATIN_FONTS.map((font) => (
                     <button
@@ -223,12 +223,12 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 </div>
               )}              {/* Reading Mode Selector */}
               <div className="space-y-4 px-1">
-                <Label className="text-sm font-medium">Mode Baca</Label>
+                <Label className="text-sm font-medium">{t("settings.reading_mode")}</Label>
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { id: "both", label: "Arab + Terjemahan", arabic: true, translation: true },
-                    { id: "arabic", label: "Arab saja", arabic: true, translation: false },
-                    { id: "translation", label: "Terjemahan saja", arabic: false, translation: true },
+                    { id: "both", label: t("settings.mode_both"), arabic: true, translation: true },
+                    { id: "arabic", label: t("settings.mode_arabic"), arabic: true, translation: false },
+                    { id: "translation", label: t("settings.mode_translation"), arabic: false, translation: true },
                   ].map((mode) => {
                     const active =
                       tempSettings.showArabicText === mode.arabic &&
@@ -255,7 +255,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   })}
                 </div>
                 <p className="px-1 text-xs text-muted-foreground/70">
-                  Pilih mau menampilkan teks Arab, terjemahan, atau keduanya saat membaca.
+                  {t("settings.reading_mode_hint")}
                 </p>
               </div>
             </div>
@@ -268,7 +268,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               </Label>
               <Select value={language} onValueChange={setLanguage}>
                 <SelectTrigger className="h-12 rounded-xl bg-muted/50 border-none px-4">
-                  <SelectValue placeholder="Pilih bahasa" />
+                  <SelectValue placeholder={t("settings.select_language")} />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl border-none shadow-xl">
                   <SelectItem value="id" className="rounded-lg">{t("settings.indonesian")}</SelectItem>

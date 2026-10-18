@@ -80,7 +80,7 @@ export function SurahList({ surahs }: SurahListProps) {
           <SearchBar
             className="flex-1 sm:w-56"
             onSearch={setSearchQuery}
-            placeholder={activeTab === "surah" ? "Cari surah..." : "Cari juz..."}
+            placeholder={activeTab === "surah" ? t("search.placeholder") : t("search.placeholder_juz")}
           />
 
           {!isMobile && (
@@ -90,7 +90,8 @@ export function SurahList({ surahs }: SurahListProps) {
                 size="icon"
                 onClick={() => setViewMode("grid")}
                 className="h-8 w-8 rounded-lg"
-                title="Grid View"
+                title={t("common.grid_view")}
+                aria-label={t("common.grid_view")}
               >
                 <LayoutGrid className="w-4 h-4" />
               </Button>
@@ -99,7 +100,8 @@ export function SurahList({ surahs }: SurahListProps) {
                 size="icon"
                 onClick={() => setViewMode("list")}
                 className="h-8 w-8 rounded-lg"
-                title="List View"
+                title={t("common.list_view")}
+                aria-label={t("common.list_view")}
               >
                 <List className="w-4 h-4" />
               </Button>

@@ -25,7 +25,7 @@ export function VerseSearchResults({ query }: VerseSearchResultsProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
-  const { language } = useLanguage()
+  const { language, t } = useLanguage()
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -73,7 +73,7 @@ export function VerseSearchResults({ query }: VerseSearchResultsProps) {
     return (
       <div className="flex flex-col items-center justify-center py-10 opacity-60">
         <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
-        <p className="text-sm">Mencari terjemahan ayat...</p>
+        <p className="text-sm">{t("search.searching_verses")}</p>
       </div>
     )
   }
@@ -81,7 +81,7 @@ export function VerseSearchResults({ query }: VerseSearchResultsProps) {
   if (error) {
     return (
       <div className="text-center py-6 text-rose-500">
-        <p className="text-sm">Terjadi kesalahan jaringan saat mencari.</p>
+        <p className="text-sm">{t("search.network_error")}</p>
       </div>
     )
   }
@@ -90,7 +90,7 @@ export function VerseSearchResults({ query }: VerseSearchResultsProps) {
     return (
       <div className="text-center py-10 bg-muted/20 rounded-3xl border-2 border-dashed border-border/50">
         <Search className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
-        <p className="text-muted-foreground font-medium">Tidak ada terjemahan ayat yang cocok dengan "{query}"</p>
+        <p className="text-muted-foreground font-medium">{t("search.verse_no_match")} "{query}"</p>
       </div>
     )
   }
@@ -99,7 +99,7 @@ export function VerseSearchResults({ query }: VerseSearchResultsProps) {
     <div className="space-y-4">
       <h3 className="text-lg font-bold tracking-tight px-2 flex items-center gap-2">
         <Search className="w-5 h-5 text-primary" />
-        Hasil Pencarian Terjemahan
+        {t("search.verse_results_title")}
       </h3>
       <div className="grid gap-3 grid-cols-1">
         {results.map((match) => (
@@ -122,7 +122,7 @@ export function VerseSearchResults({ query }: VerseSearchResultsProps) {
         ))}
       </div>
       <p className="text-center text-xs text-muted-foreground opacity-60 mt-4">
-        Menampilkan maksimal 10 hasil pencarian.
+        {t("search.max_results")}
       </p>
     </div>
   )

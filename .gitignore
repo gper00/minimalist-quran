@@ -26,7 +26,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# generated at build time from data/surah/*.json
+/public/data/tafsir/
+
 # agent
 AGENTS.md
 .omo
 .playwright-mcp
+docs/
